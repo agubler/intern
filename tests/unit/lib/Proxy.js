@@ -142,6 +142,7 @@ define([
 				var request = createRequest('/__intern/__resolveSuites__?' + query);
 				var expected = [
 					'intern-selftest/tests/unit/all',
+					'intern-selftest/tests/unit/benchmark',
 					'intern-selftest/tests/unit/main',
 					'intern-selftest/tests/unit/order',
 					'intern-selftest/tests/functional/lib/ProxiedSession'

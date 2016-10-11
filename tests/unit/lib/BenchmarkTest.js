@@ -111,6 +111,7 @@ define([
 				var expected = {
 					error: null,
 					id: 'parent id - test name',
+					parentId: 'parent id',
 					name: 'test name',
 					sessionId: 'abcd',
 					timeout: 30000,

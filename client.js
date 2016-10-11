@@ -9,11 +9,11 @@ if (typeof process !== 'undefined' && typeof define === 'undefined') {
 			map: {
 				intern: {
 					dojo: 'intern/browser_modules/dojo',
-					benchmark: 'intern/node_modules/benchmark/benchmark',
+					benchmark: 'intern/browser_modules/benchmark/benchmark',
 					chai: 'intern/browser_modules/chai/chai',
 					diff: 'intern/browser_modules/diff/diff',
-					lodash: 'intern/node_modules/lodash-amd/main',
-					platform: 'intern/node_modules/platform/platform'
+					lodash: 'intern/browser_modules/lodash-amd/main',
+					platform: 'intern/browser_modules/platform/platform'
 				},
 				'*': {
 					'intern/dojo': 'intern/browser_modules/dojo'
