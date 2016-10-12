@@ -31,6 +31,16 @@ define([
 				}
 			});
 
+			var suiteRestart = this.restartTimeout.bind(this);
+			var testRestart = test.restartTimeout.bind(test);
+
+			// Ensure the test runner's timeout gets reset along
+			// with the BenchmarkTest's timeout
+			test.restartTimeout = function (timeout) {
+				suiteRestart(timeout);
+				testRestart(timeout);
+			};
+
 			test.run().then(dfd.callback(function () {
 				assert.isAbove(executionCount, 1,
 					'Test function should have been called multiple times when run is called');
