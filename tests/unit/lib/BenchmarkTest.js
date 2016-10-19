@@ -22,29 +22,82 @@ define([
 		name: 'intern/lib/BenchmarkTest',
 
 		'BenchmarkTest#test': function () {
-			var dfd = this.async(250);
+			this.timeout = 5000;
+
 			var executionCount = 0;
 
 			var test = new BenchmarkTest({
+				name: 'BenchmarkTest#test',
 				test: function () {
 					executionCount++;
 				}
 			});
 
-			var suiteRestart = this.restartTimeout.bind(this);
-			var testRestart = test.restartTimeout.bind(test);
+			// Ensure the test runner's timeout gets reset on each cycle
+			test.benchmark.on('cycle', function () {
+				this.restartTimeout();
+			}.bind(this));
 
-			// Ensure the test runner's timeout gets reset along
-			// with the BenchmarkTest's timeout
-			test.restartTimeout = function (timeout) {
-				suiteRestart(timeout);
-				testRestart(timeout);
-			};
-
-			test.run().then(dfd.callback(function () {
+			return test.run().then(function () {
 				assert.isAbove(executionCount, 1,
 					'Test function should have been called multiple times when run is called');
-			}));
+			});
+		},
+
+		'BenchmarkTest#test (async)': function () {
+			this.timeout = 5000;
+
+			var executionCount = 0;
+
+			var test = new BenchmarkTest({
+				name: 'BenchmarkTest#test (async)',
+				test: BenchmarkTest.async(function (dfd) {
+					setTimeout(dfd.callback(function () {
+						executionCount++;
+					}), 200);
+				})
+			});
+
+			// Ensure the test runner's timeout gets reset on each cycle
+			test.benchmark.on('cycle', function () {
+				this.restartTimeout();
+			}.bind(this));
+
+			return test.run().then(function () {
+				assert.isAbove(executionCount, 1,
+					'Test function should have been called multiple times when run is called');
+			});
+		},
+
+		'BenchmarkTest#test (async, error)': function () {
+			this.timeout = 5000;
+
+			var executionCount = 0;
+
+			var test = new BenchmarkTest({
+				name: 'BenchmarkTest#test (async, error)',
+				test: BenchmarkTest.async(function (dfd) {
+					setTimeout(dfd.callback(function () {
+						executionCount++;
+						throw new Error('error');
+					}), 200);
+				})
+			});
+
+			// Ensure the test runner's timeout gets reset on each cycle
+			test.benchmark.on('cycle', function () {
+				this.restartTimeout();
+			}.bind(this));
+
+			return test.run().then(
+				function () {
+					throw new Error('test should not have passed');
+				},
+				function () {
+					assert.isAbove(executionCount, 0,
+						'Test function should have been called at least once when run is called');
+				}
+			);
 		},
 
 		'BenchmarkTest#constructor topic': function () {
@@ -58,16 +111,20 @@ define([
 					}
 				}
 			});
+			expectedTest.name = 'BenchmarkTest#constructor topic';
 			assert.isTrue(topicFired, 'newTest topic should fire after a test is created');
 			assert.strictEqual(actualTest, expectedTest,
 				'newTest topic should be passed the test that was just created');
 		},
 
 		'BenchmarkTest#constructor with benchmark options': function () {
+			this.timeout = 5000;
+
 			var runCount = 0;
 			var onStartCalled = false;
+
 			var test = new BenchmarkTest({
-				name: 'test 1',
+				name: 'BenchmarkTest#constructor with benchmark options',
 				test: (function () {
 					function testFunction() {
 						runCount++;
@@ -81,35 +138,37 @@ define([
 				})()
 			});
 
-			test.run().then(function () {
+			// Ensure the test runner's timeout gets reset on each cycle
+			test.benchmark.on('cycle', function () {
+				this.restartTimeout();
+			}.bind(this));
+
+			return test.run().then(function () {
 				assert.isAbove(runCount, 1, 'test should have run more than once');
 				assert.isTrue(onStartCalled, 'Benchmark#onStart should have been called');
 			});
 		},
 
 		'BenchmarkTest#skip': function () {
-			var skipped;
-			var test = createTest({
-				test: function () {
-					this.skip('foo');
-				},
-				reporterManagerEmit: function (topic) {
-					if (topic === 'testSkip') {
-						skipped = true;
-					}
-				}
+			var test1 = new BenchmarkTest({
+				name: 'skip 1',
+				test: BenchmarkTest.skip('foo', function () {})
+			});
+			var test2 = new BenchmarkTest({
+				name: 'skip 2',
+				test: BenchmarkTest.skip(function () {})
 			});
 
-			return test.run().then(function () {
-				assert.isTrue(skipped, 'testSkip topic should fire when a test is skipped');
-				assert.propertyVal(test, 'skipped', 'foo', 'test should have `skipped` property with expected value');
-			});
+			assert.strictEqual(test1.skipped, 'foo', 'skipped should be set to "foo" on test1');
+			assert.strictEqual(test1.benchmark, undefined, 'benchmark should be set to undefined on test1');
+			assert.strictEqual(test2.skipped, 'skipped', 'skipped should be set to "skipped" on test2');
+			assert.strictEqual(test2.benchmark, undefined, 'benchmark should be set to undefined on test2');
 		},
 
 		'BenchmarkTest#toJSON': {
 			'no error': function () {
 				var test = new BenchmarkTest({
-					name: 'test name',
+					name: 'no error',
 					parent: {
 						id: 'parent id',
 						name: 'parent id',
@@ -120,9 +179,9 @@ define([
 				});
 				var expected = {
 					error: null,
-					id: 'parent id - test name',
+					id: 'parent id - no error',
 					parentId: 'parent id',
-					name: 'test name',
+					name: 'no error',
 					sessionId: 'abcd',
 					timeout: 30000,
 					hasPassed: true,
@@ -150,7 +209,7 @@ define([
 
 			error: function () {
 				var test = new BenchmarkTest({
-					name: 'test name',
+					name: 'error',
 					parent: {
 						id: 'parent id',
 						name: 'parent id',

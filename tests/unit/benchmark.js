@@ -1,6 +1,9 @@
 define([
     'intern!benchmark'
 ], function (registerSuite) {
+	var async = registerSuite.async;
+	var skip = registerSuite.skip;
+
     registerSuite({
         name: 'example benchmarks',
 
@@ -29,6 +32,14 @@ define([
 			nested2: function () {
 				return 23 / 12;
 			}
-		}
+		},
+
+		async1: async(function (dfd) {
+			setTimeout(dfd.callback(function () {
+				return 23 / 400;
+			}), 200);
+		}),
+
+		skip1: skip('this test does nothing right now', function () {})
     });
 });
