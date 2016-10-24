@@ -4,6 +4,8 @@ define([
 	var async = registerSuite.async;
 	var skip = registerSuite.skip;
 
+	var counter = 0;
+
     registerSuite({
         name: 'example benchmarks',
 
@@ -25,12 +27,16 @@ define([
         })(),
 
 		nested: {
+			beforeEachLoop: function () {
+				counter = 0;
+			},
+
 			nested1: function () {
-				return 23 * 23;
+				return couter * 23;
 			},
 
 			nested2: function () {
-				return 23 / 12;
+				return couter / 12;
 			}
 		},
 

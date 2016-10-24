@@ -4,6 +4,20 @@ define([
 	'../../../lib/BenchmarkTest',
 	'dojo/Promise'
 ], function (registerSuite, assert, BenchmarkTest, Promise) {
+	function getTestFunction(testFunc, async) {
+		if (async) {
+			var originalFunc = testFunc;
+			testFunc = BenchmarkTest.async(function (dfd) {
+				setTimeout(dfd.callback(originalFunc.bind(this)), 200);
+			});
+		}
+		testFunc.options = testFunc.options || {};
+		// Decrease the time of the benchmark so that browsers don't
+		// time out with a "Script on the page is taking too long" alert
+		testFunc.options.maxTime = 1;
+		return testFunc;
+	}
+
 	function createTest(options) {
 		if (!options.parent) {
 			options.parent = {
@@ -51,11 +65,9 @@ define([
 
 			var test = new BenchmarkTest({
 				name: 'BenchmarkTest#test (async)',
-				test: BenchmarkTest.async(function (dfd) {
-					setTimeout(dfd.callback(function () {
-						executionCount++;
-					}), 200);
-				})
+				test: getTestFunction(function () {
+					executionCount++;
+				}, true)
 			});
 
 			// Ensure the test runner's timeout gets reset on each cycle
@@ -76,12 +88,10 @@ define([
 
 			var test = new BenchmarkTest({
 				name: 'BenchmarkTest#test (async, error)',
-				test: BenchmarkTest.async(function (dfd) {
-					setTimeout(dfd.callback(function () {
-						executionCount++;
-						throw new Error('error');
-					}), 200);
-				})
+				test: getTestFunction(function () {
+					executionCount++;
+					throw new Error('error');
+				}, true)
 			});
 
 			// Ensure the test runner's timeout gets reset on each cycle
@@ -126,13 +136,11 @@ define([
 			var test = new BenchmarkTest({
 				name: 'BenchmarkTest#constructor with benchmark options',
 				test: (function () {
-					function testFunction() {
+					var testFunction = getTestFunction(function () {
 						runCount++;
-					}
-					testFunction.options = {
-						onStart: function () {
-							onStartCalled = true;
-						}
+					});
+					testFunction.options.onStart = function () {
+						onStartCalled = true;
 					};
 					return testFunction;
 				})()
@@ -175,7 +183,7 @@ define([
 						sessionId: 'abcd',
 						timeout: 30000
 					},
-					test: function () {}
+					test: getTestFunction(function () {})
 				});
 				var expected = {
 					error: null,
@@ -216,11 +224,11 @@ define([
 						sessionId: 'abcd',
 						timeout: 30000
 					},
-					test: function () {
+					test: getTestFunction(function () {
 						var error = new Error('fail');
 						error.stack = 'stack';
 						throw error;
-					}
+					})
 				});
 
 				return test.run().then(
@@ -235,6 +243,113 @@ define([
 					}
 				);
 			}
-		}
+		},
+
+		'Lifecycle methods': (function () {
+			function isMethodCalled(methodName, isAsync) {
+				return function () {
+					var count = 0;
+					var parent = {};
+					parent[methodName] = function () {
+						count++;
+					};
+
+					var test = new BenchmarkTest({
+						name: 'test',
+						test: getTestFunction(function () {}, isAsync),
+
+						parent: parent
+					});
+
+					return test.run().then(function () {
+						assert.isAbove(count, 0, methodName + ' should have been called at least one time');
+					});
+				};
+			}
+
+			function innerOuterTest(recorder, isAsync) {
+				return new BenchmarkTest({
+					name: 'test',
+					test: getTestFunction(function () {
+						recorder('test', this);
+					}, isAsync),
+
+					parent: {
+						beforeEachLoop: function () {
+							recorder('innerBefore', this);
+						},
+						afterEachLoop: function () {
+							recorder('innerAfter', this);
+						},
+
+						parent: {
+							beforeEachLoop: function () {
+								recorder('outerBefore', this);
+							},
+							afterEachLoop: function () {
+								recorder('outerAfter', this);
+							}
+						}
+					}
+				});
+			}
+
+			function order(isAsync) {
+				return function () {
+					var counter = 0;
+					var orders = {};
+					function recordOrder(name) {
+						if (!(name in orders)) {
+							orders[name] = counter++;
+						}
+					}
+
+					var test = innerOuterTest(recordOrder, isAsync);
+
+
+					return test.run().then(function () {
+						assert.isBelow(orders.outerBefore, orders.innerBefore, 'Outer beforeEachLoop should be called before inner beforeEachLoop');
+						assert.isBelow(orders.innerBefore, orders.test, 'Inner beforeEachLoop should be called before the test');
+						assert.isBelow(orders.test, orders.innerAfter, 'Inner afterEachLoop should be called after the test');
+						assert.isBelow(orders.innerAfter, orders.outerAfter, 'Inner afterEachLoop should be called before outer afterEachLoop');
+					});
+				};
+			}
+
+			function context(isAsync) {
+				return function () {
+					var contexts = {};
+					function recordContext(name, context) {
+						if (!(name in contexts)) {
+							contexts[name] = context
+						}
+					}
+
+					var test = innerOuterTest(recordContext, isAsync);
+
+					return test.run().then(function () {
+						assert.strictEqual(contexts.test, test, 'Context of test function should be test');
+						assert.strictEqual(contexts.innerBefore, test.parent, 'Context of innerBefore should be test.parent');
+						assert.strictEqual(contexts.outerBefore, test.parent.parent, 'Context of outerBefore should be test.parent');
+						assert.strictEqual(contexts.innerAfter, test.parent, 'Context of innerAfter should be test.parent.parent');
+						assert.strictEqual(contexts.outerAfter, test.parent.parent, 'Context of outerAfter should be test.parent.parent');
+					});
+				}
+			}
+
+			function testSuite(isAsync) {
+				return {
+					'.beforeEachLoop': isMethodCalled('beforeEachLoop', isAsync),
+					'.afterEachLoop': isMethodCalled('afterEachLoop', isAsync),
+					order: order(isAsync),
+					context: context(isAsync)
+				};
+			}
+
+			return {
+				'sync test': testSuite(),
+				'async test': testSuite(true)
+			};
+		})()
 	});
 });
