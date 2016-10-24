@@ -1,19 +1,19 @@
 define([
-    'intern!benchmark'
+	'intern!benchmark'
 ], function (registerSuite) {
 	var async = registerSuite.async;
 	var skip = registerSuite.skip;
 
 	var counter = 0;
 
-    registerSuite({
-        name: 'example benchmarks',
+	registerSuite({
+		name: 'example benchmarks',
 
-        test1: function () {
-            return 2 * 2;
-        },
+		test1: function () {
+			return 2 * 2;
+		},
 
-        test2: (function () {
+		test2: (function () {
 			function test() {
 				[ 1, 2, 3, 4, 5 ].forEach(function (item) {
 					item = item * item;
@@ -24,7 +24,7 @@ define([
 			};
 
 			return test;
-        })(),
+		})(),
 
 		nested: {
 			beforeEachLoop: function () {
@@ -47,5 +47,5 @@ define([
 		}),
 
 		skip1: skip('this test does nothing right now', function () {})
-    });
+	});
 });
