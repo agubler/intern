@@ -1,65 +1,114 @@
-import * as aspect from 'dojo/aspect';
+import { after } from 'dojo/aspect';
+import { delegate } from 'dojo/lang';
 import * as Promise from 'dojo/Promise';
-import { assert as chaiAssert, AssertionError } from 'chai';
-import * as main from '../../main';
 import { Suite } from '../Suite';
 import { Test, TestFunction } from '../Test';
-import * as util from '../util';
+import { escapeRegExp } from '../util';
+import { assert, AssertionError } from 'chai';
 import { Removable } from '../../interfaces';
+import * as main from '../../main';
+import { Executor } from '../../lib/executors/Executor';
+
+export interface QUnitAssertions {
+	deepEqual(actual: any, expected: any, message?: string): void;
+	equal(actual: any, expected: any, message?: string): void;
+	expect(numTotal?: number): void | number;
+	notDeepEqual(actual: any, expected: any, message?: string): void;
+	notEqual(actual: any, expected: any, message?: string): void;
+	// notOk(state: any, message?: string): void;
+	notPropEqual(actual: any, expected: any, message?: string): void;
+	notStrictEqual(actual: any, expected: any, message?: string): void;
+	ok(state: any, message?: string): void;
+	push(ok: boolean, actual: any, expected: any, message?: string): void;
+	// pushResult(assertionResult: AssertionResult): void;
+	propEqual(actual: any, expected: any, message?: string): void;
+	strictEqual(actua: any, expected: any, message?: string): void;
+	throws(block: Function, expected: Object | RegExp | Error, message?: string): void;
+	raises(block: Function, expected: Object | RegExp | Error, message?: string): void;
+	verifyAssertions(): void;
+}
+
+export interface QUnitBaseAssert extends QUnitAssertions {
+	_expectedAssertions: number;
+	_numAssertions: number;
+}
+
+export interface QUnitConfig {
+	autostart: boolean;
+	_module: string;
+	module: string;
+	requireExpects: boolean;
+	testTimeout: number;
+}
+
+export interface QUnitHooks {
+	before?: () => void;
+	beforeEach?: () => void;
+	afterEach?: () => void;
+	after?: () => void;
+
+	// TODO: Per http://api.qunitjs.com/QUnit.module/, the below methods don't exist for module's hooks
+	setup?: () => void;
+	teardown?: () => void;
+}
 
 let currentSuites: Suite[];
 
-export namespace assert {
-	export let _numAssertions = 0;
-	export let _expectedAssertions: number = NaN;
+function registerTest(name: string, test: TestFunction): void {
+	currentSuites.forEach(function (suite) {
+		suite.tests.push(new Test({
+			name: name,
+			parent: suite,
+			test: test
+		}));
+	});
+}
 
-	function wrapChai(name: string): Function {
-		return function () {
-			// TODO: Could try/catch errors to make them act more like the way QUnit acts, where an assertion failure
-			// does not fail the test, but not sure of the best way to get multiple assertion failures out of a test
-			// like that
-			++_numAssertions;
-			( <{ [key: string]: any }> chaiAssert)[name].apply(chaiAssert, arguments);
-		};
-	}
+function wrapChai(name: string) {
+	return function (this: QUnitBaseAssert): void {
+		// TODO: Could try/catch errors to make them act more like the way QUnit acts, where an assertion failure
+		// does not fail the test, but not sure of the best way to get multiple assertion failures out of a test
+		// like that
+		++this._numAssertions;
+		(<{ [key: string]: any }> assert)[name].apply(assert, arguments);
+	};
+}
 
-	export const deepEqual = wrapChai('deepEqual');
-	export const equal = wrapChai('equal');
-	export const notDeepEqual = wrapChai('notDeepEqual');
-	export const notEqual = wrapChai('notEqual');
-	export const notPropEqual = wrapChai('notDeepEqual');
-	export const notStrictEqual = wrapChai('notStrictEqual');
-	export const ok = wrapChai('ok');
-	export const propEqual = wrapChai('propEqual');
-	export const strictEqual = wrapChai('strictEqual');
+const baseAssert: QUnitBaseAssert = {
+	_expectedAssertions: NaN,
+	_numAssertions: 0,
 
-	export function expect(numTotal: number): number | void {
+	deepEqual: wrapChai('deepEqual'),
+	equal: wrapChai('equal'),
+	expect: function (this: QUnitBaseAssert, numTotal?: number): number | void {
 		if (arguments.length === 1) {
-			_expectedAssertions = numTotal;
+			this._expectedAssertions = numTotal;
 		}
 		else {
-			return _expectedAssertions;
+			return this._expectedAssertions;
 		}
-	}
-
-	export function push(ok: boolean, actual: any, expected: any, message: string): void {
-		++_numAssertions;
+	},
+	notDeepEqual: wrapChai('notDeepEqual'),
+	notEqual: wrapChai('notEqual'),
+	notPropEqual: wrapChai('notDeepEqual'),
+	notStrictEqual: wrapChai('notStrictEqual'),
+	ok: wrapChai('ok'),
+	push: function (this: QUnitBaseAssert, ok: any, actual: any, expected: any, message?: string): void {
+		++this._numAssertions;
 		if (!ok) {
 			throw new AssertionError(message, { actual: actual, expected: expected });
 		}
-	}
-
-	export const throws = (function () {
+	},
+	propEqual: wrapChai('propEqual'),
+	strictEqual: wrapChai('strictEqual'),
+	throws: (function () {
 		const throws = wrapChai('throws');
-		return function (this: any, fn: Function, expected?: any, message?: string): void {
+		return function (this: QUnitBaseAssert, fn: Function, expected: Object | RegExp | Error, message?: string) {
 			if (typeof expected === 'function') {
-				++_numAssertions;
+				++this._numAssertions;
 				try {
 					fn();
-					throw new AssertionError(
-						(message ? message + ': ' : '') +
-						'expected [Function] to throw'
-					);
+					throw new AssertionError(`${message ? message + ': ' : ''}expected [Function] to throw`);
 				}
 				catch (error) {
 					if (!expected(error)) {
@@ -75,245 +124,240 @@ export namespace assert {
 				throws.apply(this, arguments);
 			}
 		};
-	})();
+	})(),
+	raises: function (this: QUnitBaseAssert) {
+		return this.throws.apply(this, arguments);
+	},
 
-	export function raises(this: any, fn: Function, expected?: any, message?: string): void {
-		return throws.apply(this, arguments);
+	verifyAssertions: function (this: QUnitBaseAssert) {
+		if (isNaN(this._expectedAssertions) && QUnit.config.requireExpects) {
+			throw new AssertionError('Expected number of assertions to be defined, but expect() was ' +
+				'not called.');
+		}
+
+		if (!isNaN(this._expectedAssertions) && this._numAssertions !== this._expectedAssertions) {
+			throw new AssertionError('Expected ' + this._expectedAssertions + ' assertions, but ' +
+				this._numAssertions + ' were run');
+		}
 	}
-
-	export function verifyAssertions() {
-		if (isNaN(_expectedAssertions) && config.requireExpects) {
-			throw new AssertionError(`Expected number of assertions to be defined, but expect() was not called.`);
-		}
-
-		if (!isNaN(_expectedAssertions) && _numAssertions !== _expectedAssertions) {
-			throw new AssertionError(`Expected ${_expectedAssertions} assertions, but ${_numAssertions} were run`);
-		}
-	}
-}
-
-function registerTest(name: string, test: TestFunction) {
-	currentSuites.forEach(function (suite) {
-		suite.tests.push(new Test({
-			name: name,
-			parent: suite,
-			test: test
-		}));
-	});
-}
-
-let autostartHandle: Removable;
-let startMethod: Function;
-let stopMethod: Function;
-let _module: any; // TODO: fix type
-
-export const config = {
-	get autostat(): boolean {
-		return !autostartHandle;
-	},
-
-	set autostart(value: boolean) {
-		if (autostartHandle) {
-			autostartHandle.remove();
-			autostartHandle = null;
-		}
-
-		if (!value) {
-			autostartHandle = aspect.after(main.executor.config, 'before', function (waitGuard: Promise<any>) {
-				return new Promise(resolve => {
-					startMethod = function () {
-						if (waitGuard && waitGuard.then) {
-							waitGuard.then(resolve);
-						}
-						else {
-							resolve();
-						}
-					};
-				});
-			});
-			startMethod = function () {
-				autostartHandle.remove();
-				autostartHandle = null;
-				startMethod = function () {};
-			};
-		}
-	},
-
-	get module() {
-		return _module;
-	},
-
-	set module(value) {
-		_module = value;
-		main.executor.register(function (suite: Suite) {
-			suite.grep = new RegExp('(?:^|[^-]* - )' + util.escapeRegExp(value) + ' - ', 'i');
-		});
-	},
-
-	requireExpects: false,
-	testTimeout: Infinity
 };
 
-export function start() {
-	if (typeof startMethod === 'function') {
-		startMethod();
-	}
-}
+let autostartHandle: Removable;
 
-export function stop() {
-}
-
-export function extend(target: { [key: string]: any }, mixin: { [key: string]: any }, skipExistingTargetProperties?: boolean): Object {
-	for (let key in mixin) {
-		if (mixin.hasOwnProperty(key)) {
-			if (mixin[key] === undefined) {
-				delete target[key];
+/* tslint:disable-next-line */
+export const QUnit = {
+	assert: baseAssert,
+	config: <QUnitConfig> {
+		get autostart() {
+			return !autostartHandle;
+		},
+		set autostart(value) {
+			if (autostartHandle) {
+				autostartHandle.remove();
+				autostartHandle = null;
 			}
-			else if (!skipExistingTargetProperties || target[key] === undefined) {
-				target[key] = mixin[key];
+
+			if (!value) {
+				autostartHandle = after(main.executor.config, 'before', function (waitGuard?: Promise<void>) {
+					return new Promise(function (resolve) {
+						QUnit.start = function () {
+							if (waitGuard && waitGuard.then) {
+								waitGuard.then(function () {
+									resolve();
+								});
+							}
+							else {
+								resolve();
+							}
+						};
+					});
+				});
+				QUnit.start = function () {
+					autostartHandle.remove();
+					autostartHandle = null;
+					QUnit.start = function () {};
+				};
+			}
+		},
+		_module: <string> null,
+		get module(this: QUnitConfig) {
+			return this._module;
+		},
+		set module(this: QUnitConfig, value: string) {
+			this._module = value;
+			main.executor.register(function (suite) {
+				suite.grep = new RegExp('(?:^|[^-]* - )' + escapeRegExp(value) + ' - ', 'i');
+			});
+		},
+		requireExpects: false,
+		testTimeout: Infinity
+	},
+
+	extend: function (target: { [key: string]: any }, mixin: { [key: string]: any }, skipExistingTargetProperties: boolean = false): { [key: string]: any } {
+		for (let key in mixin) {
+			if (mixin.hasOwnProperty(key)) {
+				if (mixin[key] === undefined) {
+					delete target[key];
+				}
+				else if (!skipExistingTargetProperties || target[key] === undefined) {
+					target[key] = mixin[key];
+				}
 			}
 		}
-	}
-	return target;
-}
+		return target;
+	},
 
-export function asyncTest(name: string, test: TestFunction): void {
-	registerTest(name, function (this: Test) {
-		let numCallsUntilResolution = 1;
-		this.timeout = config.testTimeout;
-		const dfd = this.async();
-		let testAssert = lang.delegate(assert, { _expectedAssetions: NaN, numAssertions: 0 });
+	start: function () {},
+	stop: function () {},
 
-		stopMethod = function () {
-			++numCallsUntilResolution;
-		};
+	// test registration
+	asyncTest: function (name: string, test: TestFunction): void {
+		registerTest(name, function (this: any) {
+			this.timeout = QUnit.config.testTimeout;
 
-		startMethod = dfd.rejectOnError(function () {
-			if (--numCallsUntilResolution === 0) {
-				try {
-					testAssert.verifyAssertions();
-					dfd.resolve();
+			let numCallsUntilResolution = 1;
+			const dfd = this.async();
+			const testAssert = delegate(baseAssert, { _expectedAssertions: NaN, _numAssertions: 0 });
+
+			QUnit.stop = function () {
+				++numCallsUntilResolution;
+			};
+			QUnit.start = <() => void> dfd.rejectOnError(function () {
+				if (--numCallsUntilResolution === 0) {
+					try {
+						testAssert.verifyAssertions();
+						dfd.resolve();
+					}
+					finally {
+						QUnit.stop = QUnit.start = function () {};
+					}
 				}
-				finally {
-					stopMethod = startMethod = function () {};
+			});
+
+			try {
+				test.call(this.parent._qunitContext, testAssert);
+			}
+			catch (error) {
+				dfd.reject(error);
+			}
+		});
+	},
+	module: function (name: string, lifecycle: QUnitHooks) {
+		currentSuites = [];
+		main.executor.register(function (parentSuite: Suite) {
+			const suite = new Suite({ name: name, parent: parentSuite, _qunitContext: {} });
+			parentSuite.tests.push(suite);
+			currentSuites.push(suite);
+
+			if (lifecycle) {
+				if (lifecycle.setup) {
+					after(suite, 'beforeEach', function (this: any) {
+						lifecycle.setup.call(this._qunitContext);
+					});
+				}
+
+				if (lifecycle.teardown) {
+					after(suite, 'afterEach', function (this: any) {
+						lifecycle.teardown.call(this._qunitContext);
+					});
 				}
 			}
 		});
+	},
+	test: function (name: string, test: TestFunction) {
+		registerTest(name, function (this: any) {
+			const testAssert = delegate(baseAssert, { _expectedAssertions: NaN, _numAssertions: 0 });
+			test.call(this.parent._qunitContext, testAssert);
+			testAssert.verifyAssertions();
+		});
+	},
 
-		try {
-			test.call(this.parent._quinitContext, testAssert);
-		}
-		catch (error) {
-			dfd.reject(error);
-		}
-	});
-}
+	// callbacks
+	begin: function (callback: Function) {
+		main.executor.reporterManager.on('runStart', function (executor: Executor) {
+			const numTests = executor.suites.reduce(function (numTests, suite) {
+				return numTests + suite.numTests;
+			}, 0);
 
-export function module(name: string, lifecycle): void {
-	currentSuites = [];
-	main.executor.register(function (parent) {
-		var suite = new Suite({ name, parent, _qunitContext: {} });
-		parent.tests.push(suite);
-		currentSuites.push(suite);
+			callback({ totalTests: numTests });
+		});
+	},
+	done: function (callback: Function) {
+		main.executor.reporterManager.on('runEnd', function (executor: Executor) {
+			const numFailedTests = executor.suites.reduce(function (numTests: number, suite: Suite): number {
+				return numTests + suite.numFailedTests;
+			}, 0);
+			const numTests = executor.suites.reduce(function (numTests: number, suite: Suite): number {
+				return numTests + suite.numTests;
+			}, 0);
+			const numSkippedTests = executor.suites.reduce(function (numTests: number, suite: Suite): number {
+				return numTests + suite.numSkippedTests;
+			}, 0);
+			const timeElapsed = Math.max.apply(null, executor.suites.map(function (suite: Suite): number {
+				return suite.timeElapsed;
+			}));
 
-		if (lifecycle) {
-			if (lifecycle.setup) {
-				aspect.after(suite, 'beforeEach', function (this: { _qunitContext: Object }) {
-					lifecycle.setup.call(this._qunitContext);
+			callback({
+				failed: numFailedTests,
+				passed: numTests - numFailedTests - numSkippedTests,
+				total: numTests,
+				runtime: timeElapsed
+			});
+		});
+	},
+	log: function (callback: Function) {
+		main.executor.reporterManager.on('testEnd', function (test: Test) {
+			callback({
+				result: test.hasPassed,
+				actual: test.error && test.error.actual,
+				expected: test.error && test.error.expected,
+				message: test.error && test.error.message,
+				source: test.error && test.error.stack,
+				module: test.parent.name,
+				name: test.name
+			});
+		});
+	},
+	moduleDone: function (callback: Function) {
+		main.executor.reporterManager.on('suiteEnd', function (suite: any) {
+			if (suite._qunitContext) {
+				callback({
+					name: suite.name,
+					failed: suite.numFailedTests,
+					passed: suite.numTests - suite.numFailedTests - suite.numSkippedTests,
+					total: suite.numTests,
+					runtime: suite.timeElapsed
 				});
 			}
-			if (lifecycle.teardown) {
-				aspect.after(suite, 'afterEach', function (this: { _qunitContext: Object }) {
-					lifecycle.teardown.call(this._qunitContext);
+		});
+	},
+	moduleStart: function (callback: Function) {
+		main.executor.reporterManager.on('suiteStart', function (suite: any) {
+			if (suite._qunitContext) {
+				callback({
+					name: suite.name
 				});
 			}
-		}
-	});
-}
-
-export function test(name: string, test: TestFunction): void {
-	registerTest(name, function () {
-		var testAssert = lang.delegate(assert, { _expectedAssertions: NaN, _numAssertions: 0 });
-
-		test.call(this.parent._qunitContext, testAssert);
-		testAssert.verifyAssertions();
-	});
-}
-
-export function begin(callback: Function): void {
-	main.executor.reporterManager.on('runStart', function (executor) {
-		let totalTests = executor.suites.reduce((numTests, suite) => numTests + suite.numTests, 0);
-		callback({ totalTests });
-	});
-}
-
-export function done(callback: Function): void {
-	main.executor.reporterManager.on('runEnd', function (executor) {
-		let failed = executor.suites.reduce((numTests, suite) => numTests + suite.numFailedTests, 0);
-		let passed = executor.suites.reduce((numTests, suite) => numTests + suite.numTests, 0);
-		let skipped = executor.suites.reduce((numTests, suite) => numTests + suite.numSkippedTests, 0);
-		let runtime = Math.max.apply(null, executor.suites.map(suite => suite.timeElapsed));
-
-		callback({ failed, skipped, passed, runtime });
-	});
-}
-
-export function log(callback: Function): void {
-	main.executor.reporterManager.on('testEnd', function (test) {
-		callback({
-			result: test.hasPassed,
-			actual: test.error && test.error.actual,
-			expected: test.error && test.error.expected,
-			message: test.error && test.error.message,
-			source: test.error && test.error.stack,
-			module: test.parent.name,
-			name: test.name
 		});
-	});
-}
-
-export function moduleDone(callback: Function): void {
-	main.executor.reporterManager.on('suiteEnd', function (suite: Suite) {
-		if (suite._qunitContext) {
+	},
+	testDone: function (callback: Function) {
+		main.executor.reporterManager.on('testEnd', function (test: Test) {
 			callback({
-				name: suite.name,
-				failed: suite.numFailedTests,
-				passed: suite.numTests - suite.numFailedTests - suite.numSkippedTests,
-				total: suite.numTests,
-				runtime: suite.timeElapsed
+				name: test.name,
+				module: test.parent.name,
+				failed: test.hasPassed ? 0 : 1,
+				passed: test.hasPassed ? 1 : 0,
+				total: 1,
+				runtime: test.timeElapsed
 			});
-		}
-	});
-}
-
-export function moduleStart(callback: Function): void {
-	main.executor.reporterManager.on('suiteStart', function (suite: Suite) {
-		if (suite._qunitContext) {
+		});
+	},
+	testStart: function (callback: Function) {
+		main.executor.reporterManager.on('testStart', function (test) {
 			callback({
-				name: suite.name
+				name: test.name,
+				module: test.parent.name
 			});
-		}
-	});
-}
-
-export function testDone(callback: Function): void {
-	main.executor.reporterManager.on('testEnd', function (test: Test) {
-		callback({
-			name: test.name,
-			module: test.parent.name,
-			failed: test.hasPassed ? 0 : 1,
-			passed: test.hasPassed ? 1 : 0,
-			total: 1,
-			runtime: test.timeElapsed
 		});
-	});
-}
-
-export function testStart(callback: Function): void {
-	main.executor.reporterManager.on('testStart', function (test: Test) {
-		callback({
-			name: test.name,
-			module: test.parent.name
-		});
-	});
-}
+	}
+};

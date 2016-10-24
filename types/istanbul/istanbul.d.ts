@@ -44,6 +44,8 @@ declare module 'istanbul' {
 	}
 
 	export class Configuration {
+		file?: string;
+		watermarks?: Watermarks;
 	}
 
 	export class Instrumenter {

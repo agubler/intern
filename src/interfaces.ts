@@ -79,7 +79,7 @@ export interface Removable {
 	remove: () => void;
 }
 
-interface ProxyConfig {
+export interface ProxyConfig {
 	basePath?: string;
 	excludeInstrumentation?: boolean|RegExp;
 	instrument?: boolean;
@@ -88,9 +88,10 @@ interface ProxyConfig {
 	waitForRunner?: boolean;
 }
 
-interface Proxy {
+export interface Proxy {
 	config: ProxyConfig;
 	server: Object; // http.Server; start(): Promise<void>; }
+}
 
 export interface ReporterConfig {
 	console?: any; // Console

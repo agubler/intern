@@ -9,7 +9,7 @@ import * as Promise from 'dojo/Promise';
 // Node modules
 import * as fs from 'fs';
 import * as pathUtil from 'path';
-import * as istanbulDefaults from 'instanbul/lib/report/common/defaults';
+import * as istanbulDefaults from 'istanbul/lib/report/common/defaults';
 import { Watermarks } from 'istanbul';
 
 export interface ReporterConfig {
@@ -36,7 +36,7 @@ export interface ReporterConstructor {
 	new (options?: any): Reporter;
 }
 
-export type Listener = (reporter: Reporter, ...args: any[]) => (void|Promise<any>);
+export type Listener = (...args: any[]) => (void|Promise<any>);
 
 /**
  * A class that manages a set of reporters
@@ -185,8 +185,8 @@ export class ReporterManager {
 		const allArgs = arguments;
 
 		return Promise.all(this._reporters.map((reporter) => {
-			var listener: Listener = (<any> reporter)[name];
-			var sendArgs: (IArguments|any[]) = args;
+			let listener: Listener = (<any> reporter)[name];
+			let sendArgs: (IArguments|any[]) = args;
 
 			if (!listener && reporter.$others) {
 				listener = reporter.$others;
@@ -202,7 +202,7 @@ export class ReporterManager {
 				}
 
 				try {
-					var result = listener.apply(reporter, sendArgs);
+					let result = listener.apply(reporter, sendArgs);
 					if (result && result.then && name !== 'reporterError') {
 						return result.then(null, (error: Error) => {
 							return this.emit('reporterError', reporter, error);
@@ -228,7 +228,7 @@ export class ReporterManager {
 		let reporter: Reporter = {};
 		reporter[eventName] = listener;
 
-		var reporters = this._reporters;
+		let reporters = this._reporters;
 		reporters.push(reporter);
 
 		return {
