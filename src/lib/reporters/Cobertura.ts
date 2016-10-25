@@ -1,17 +1,13 @@
-import { resolve } from 'path';
-import { Collector } from 'istanbul';
-import { CoberturaReport } from 'istanbul/lib/report/cobertura';
-import { ReporterConfig } from '../ReporterManager';
+import { resolve } from 'dojo/node!path';
+import { Collector } from 'dojo/node!istanbul/lib/collector';
+import { CoberturaReport } from 'dojo/node!istanbul/lib/report/cobertura';
+import { Reporter, ReporterConfig } from '../../interfaces';
 
-export interface CoberturaReporterConfig extends ReporterConfig {
-	projectRoot?: string;
-}
-
-export class Cobertura {
+export class Cobertura implements Reporter {
 	private _collector: Collector;
 	private _reporter: CoberturaReport;
 
-	constructor(config: CoberturaReporterConfig = {}) {
+	constructor(config: ReporterConfig) {
 		this._collector = new Collector();
 		this._reporter = new CoberturaReport({
 			file: config.filename,
@@ -23,7 +19,7 @@ export class Cobertura {
 		}
 	}
 
-	coverage(sessionId: string, coverage: Object) {
+	coverage(sessionId: string, coverage: Object): void {
 		this._collector.add(coverage);
 	}
 

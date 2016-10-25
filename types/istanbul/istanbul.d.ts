@@ -1,5 +1,5 @@
 declare module 'istanbul' {
-	export interface config {
+	export interface Config {
 		loadFile: (file: string, overrides: { [key: string]: any }) => Configuration;
 	}
 
@@ -46,6 +46,7 @@ declare module 'istanbul' {
 	export class Configuration {
 		file?: string;
 		watermarks?: Watermarks;
+		dir?: string;
 	}
 
 	export class Instrumenter {
@@ -69,10 +70,26 @@ declare module 'istanbul' {
 	export const VERSION: string;
 }
 
+declare module 'istanbul/lib/collector' {
+	export interface CollectorOptions {
+		store: any; // MemoryStore
+	}
+
+	export class Collector {
+		new (options?: CollectorOptions): Collector;
+		add(coverage: Object): void;
+		files(): string[];
+		fileCoverageFor(fileName: string): Object;
+		getFinalCoverage(): Object;
+		dispose(): void;
+	}
+}
+
 declare module 'istanbul/lib/report' {
 	import { EventEmitter } from 'events';
 	import { Collector, Configuration } from 'istanbul';
 	export class Report extends EventEmitter {
+		static TYPE: string;
 		static mix(cons: Object, proto: Object): void;
 		static register(ctor: Function): void;
 		static create(t: string, opts: Object): void;
@@ -94,7 +111,7 @@ declare module 'istanbul/lib/report/cobertura' {
 	import { Report } from 'istanbul/lib/report';
 	import { Configuration, Collector } from 'istanbul';
 	export class CoberturaReport extends Report {
-		new (opts: Configuration): CoberturaReport;
+		constructor(config?: any);
 		projectRoot: string;
 		dir?: string;
 		file?: string;

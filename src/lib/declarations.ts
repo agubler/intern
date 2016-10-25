@@ -21,3 +21,11 @@ declare module 'dojo/node!net' {
 declare module 'dojo/node!mimetype' {
 	export function lookup(input: string): (string|false);
 }
+
+declare module 'dojo/node!istanbul/lib/collector' {
+	export * from 'istanbul/lib/collector';
+}
+
+declare module 'dojo/node!istanbul/lib/report/cobertura' {
+	export * from 'istanbul/lib/report/cobertura';
+}

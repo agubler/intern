@@ -98,13 +98,13 @@ export interface ReporterConfig {
 	watermarks?: any; // Watermarks;
 	filename?: string;
 	output?: any; // Console
+	projectRoot?: string;
 }
 
 export interface Reporter {
-	console: any; // Console;
-	output: any; // Output;
-	new (config: ReporterConfig): Reporter;
-	coverage?: (sessionId: string) => void;
+	console?: any; // Console;
+	output?: any; // Output;
+	coverage?: (sessionId: string, data?: Object) => void;
 	deprecated?: (name: string, replacement?: string, extra?: string) => void;
 	fatalError?: (error: Error) => void;
 	newSuite?: (suite: Suite) => void;
