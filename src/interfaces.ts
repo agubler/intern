@@ -93,12 +93,18 @@ export interface Proxy {
 	server: Object; // http.Server; start(): Promise<void>; }
 }
 
+export interface ReporterOutput {
+	write(chunk: string | Buffer, encoding?: string, callback?: Function): void;
+	end(chunk: string | Buffer, encoding?: string, callback?: Function): void;
+}
+
 export interface ReporterConfig {
 	console?: any; // Console
 	watermarks?: any; // Watermarks;
 	filename?: string;
-	output?: any; // Console
+	output?: ReporterOutput;
 	projectRoot?: string;
+	directory?: string;
 }
 
 export interface Reporter {

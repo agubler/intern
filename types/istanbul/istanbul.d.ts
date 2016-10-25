@@ -38,6 +38,19 @@ declare module 'istanbul' {
 		branches: number[];
 	}
 
+	// TODO: better define these types
+	export interface FileCoverage {
+		l: any;
+		f: any;
+		fnMap: any;
+		s: any;
+		statementMap: any;
+		b: any;
+		branchMap: any;
+		code: string;
+		path: string;
+	}
+
 	export class Collector {
 		constructor(options?: any);
 		add(coverage: any, testName?: string): void;
@@ -70,6 +83,31 @@ declare module 'istanbul' {
 	export const VERSION: string;
 }
 
+declare module 'istanbul/lib/util/writer' {
+	import { EventEmitter } from 'events';
+
+	export abstract class ContentWriter {
+		abstract write(str: string): void;
+		println(str: string): void;
+	}
+
+	export abstract class Writer extends EventEmitter {
+		abstract writeFile(file: string, callback: Function): void;
+		abstract copyFile(source: string, dest: string): void;
+		abstract done(): void;
+	}
+}
+
+declare module 'istanbul/lib/util/file-writer' {
+	import { Writer } from 'istanbul/lib/util/writer';
+
+	export default class FileWriter extends Writer {
+		copyFile(source: string, dest: string): void;
+		writeFile(file: string, callback: Function): void;
+		done(): void;
+	}
+}
+
 declare module 'istanbul/lib/collector' {
 	export interface CollectorOptions {
 		store: any; // MemoryStore
@@ -88,7 +126,7 @@ declare module 'istanbul/lib/collector' {
 declare module 'istanbul/lib/report' {
 	import { EventEmitter } from 'events';
 	import { Collector, Configuration } from 'istanbul';
-	export class Report extends EventEmitter {
+	export default class Report extends EventEmitter {
 		static TYPE: string;
 		static mix(cons: Object, proto: Object): void;
 		static register(ctor: Function): void;
@@ -108,7 +146,7 @@ declare module 'istanbul/lib/report/common/defaults' {
 }
 
 declare module 'istanbul/lib/report/cobertura' {
-	import { Report } from 'istanbul/lib/report';
+	import Report from 'istanbul/lib/report';
 	import { Configuration, Collector } from 'istanbul';
 	export class CoberturaReport extends Report {
 		constructor(config?: any);
@@ -122,13 +160,54 @@ declare module 'istanbul/lib/report/cobertura' {
 
 declare module 'istanbul/lib/report/text' {
 	// static TYPE: string;
-	import { Report } from 'istanbul/lib/report';
+	import Report from 'istanbul/lib/report';
 	import { Watermarks } from 'istanbul';
 	export class TextReport extends Report {
+		constructor(opts?: any);
 		dir: string;
 		opts?: string;
 		summary: any;
 		maxCols: number;
 		watermarks: Watermarks;
+	}
+}
+
+declare module 'istanbul/lib/report/json' {
+	import Report from 'istanbul/lib/report';
+
+	export class JsonReport extends Report {
+	}
+}
+
+declare module 'istanbul/lib/report/html' {
+	import Report from 'istanbul/lib/report';
+	import FileWriter from 'istanbul/lib/util/file-writer';
+	import { Collector, FileCoverage } from 'istanbul';
+
+	// LinkMapper API taken from the stnardLinkMapper in
+	// istanbul/lib/report/html.js
+	export interface LinkMapper {
+		fromParent(node: Node): string;
+		ancestorHref(node: Node, num: number): string;
+		ancestor(node: Node, num: number): string;
+		asset(node: Node, name: string): string;
+	}
+
+	export interface TemplateData {
+		entity: string;
+		metrics: any;
+		reportClass: string;
+		pathToHtml: any;
+		prettify: { js: any, css: any };
+	}
+
+	export class HtmlReport extends Report {
+		constructor(opts?: any);
+		getPathHtml(node: Node, linkMapper: LinkMapper): string;
+		fillTemplate(node: Node, templateData: TemplateData): void;
+		writeDetailPage(writer: FileWriter, node: Node, fileCoverage: FileCoverage): void;
+		writeIndexPage(writer: FileWriter, node: Node): void;
+		writeFiles(writer: FileWriter, node: Node, dir: string, collector: Collector): void;
+		standardLinkMapper(): LinkMapper;
 	}
 }
