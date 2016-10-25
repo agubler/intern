@@ -1,24 +1,26 @@
 import * as util from '../util';
 import { Suite } from '../Suite';
+import { Test } from '../Test';
 import { Reporter, ReporterConfig } from '../../interfaces';
+import { Executor } from '../../lib/executors/Executor';
 
 /**
  * There is no formal spec for this format and everyone does it differently, so good luck! We've mashed as many of the
  * different incompatible JUnit/xUnit XSDs as possible into one reporter.
  */
 
-/**
- * Simple XML generator.
- * @constructor
- * @param {string} nodeName The node name.
- * @param {Object?} attributes Optional attributes.
- */
 class XmlNode {
 	nodeName: string;
-	childNodes: Node[];
+	childNodes: XmlNode[];
 	attributes: any;
 
-	constructor(nodeName: string, attributes: Object = {}) {
+	/**
+	 * Simple XML generator.
+	 * @constructor
+	 * @param {string} nodeName The node name.
+	 * @param {Object?} attributes Optional attributes.
+	 */
+	constructor(nodeName: string, attributes: any = {}) {
 		this.nodeName = nodeName;
 
 		if (attributes.childNodes) {
@@ -91,8 +93,8 @@ function createSuiteNode(suite: Suite): XmlNode {
 	});
 }
 
-function createTestNode(test): XmlNode {
-	if (test.tests) {
+function createTestNode(test: Suite | Test): XmlNode {
+	if (test instanceof Suite) {
 		return createSuiteNode(test);
 	}
 
@@ -119,13 +121,12 @@ function createTestNode(test): XmlNode {
 }
 
 export class JUnit implements Reporter {
-	output;
-
+	output: any;
 	constructor(config: ReporterConfig = {}) {
 		this.output = config.output;
 	}
 
-	runEnd(executor): void {
+	runEnd(executor: Executor): void {
 		const rootNode = new XmlNode('testsuites');
 		executor.suites.forEach(suite => rootNode.childNodes.push(createSuiteNode(suite)));
 		const report = `<?xml version="1.0" encoding="UTF-8" ?>${rootNode.toString()}`;
