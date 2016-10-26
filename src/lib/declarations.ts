@@ -45,3 +45,11 @@ declare module 'dojo/node!istanbul/lib/report/html' {
 declare module 'dojo/node!istanbul/lib/report/text' {
 	export * from 'istanbul/lib/report/text';
 }
+
+declare module 'dojo/has!host-node?dojo/node!istanbul/lib/collector' {
+	export * from 'istanbul/lib/collector';
+}
+
+declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/text' {
+	export * from 'istanbul/lib/report/text';
+}
