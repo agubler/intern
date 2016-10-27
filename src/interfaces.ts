@@ -109,7 +109,7 @@ export interface ReporterConfig {
 
 export interface Reporter {
 	console?: any; // Console;
-	output?: NodeJS.WritableStream;
+	output?: ReporterOutput;
 	coverage?: (sessionId: string, data?: Object) => void;
 	deprecated?: (name: string, replacement?: string, extra?: string) => void;
 	fatalError?: (error: Error) => void;
