@@ -46,6 +46,10 @@ declare module 'dojo/node!istanbul/lib/report/text' {
 	export * from 'istanbul/lib/report/text';
 }
 
+declare module 'dojo/node!istanbul/lib/report/lcovonly' {
+	export * from 'istanbul/lib/report/lcovonly';
+}
+
 declare module 'dojo/has!host-node?dojo/node!istanbul/lib/collector' {
 	export * from 'istanbul/lib/collector';
 }

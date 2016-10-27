@@ -211,3 +211,14 @@ declare module 'istanbul/lib/report/html' {
 		standardLinkMapper(): LinkMapper;
 	}
 }
+
+declare module 'istanbul/lib/report/lcovonly' {
+	import Report from 'istanbul/lib/report';
+	import FileWriter from 'istanbul/lib/util/file-writer';
+	import { FileCoverage } from 'istanbul';
+
+	export class LcovOnlyReport extends Report {
+		constructor(opts?: any);
+		writeFileCoverage(writer: FileWriter, fc: FileCoverage): void;
+	}
+}
