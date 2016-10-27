@@ -240,9 +240,9 @@ export function getModule(moduleId: string, loader?: IRequire) {
 	});
 }
 
-export function getShouldWait(waitMode: (string|boolean), message: string) {
-	var shouldWait = false;
-	var eventName = message[0];
+export function getShouldWait(waitMode: (string|boolean), message: string|any[]) {
+	let shouldWait = false;
+	let eventName = message[0];
 
 	if (waitMode === 'fail') {
 		if (
