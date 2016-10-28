@@ -15,7 +15,8 @@
     "./types/dojo2/dojo.d.ts",
     "./types/leadfoot/leadfoot.d.ts",
     "./types/digdug/digdug.d.ts",
-    "./types/istanbul/istanbul.d.ts"
+    "./types/istanbul/istanbul.d.ts",
+	"./types/charm/charm.d.ts"
   ],
   "include": [
     "./src/**/*.ts",

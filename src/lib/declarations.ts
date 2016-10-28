@@ -22,6 +22,20 @@ declare module 'dojo/node!mimetype' {
 	export function lookup(input: string): (string|false);
 }
 
+declare module 'dojo/node!util' {
+	export * from 'util';
+}
+
+declare module 'dojo/node!charm' {
+	import * as charm from 'charm';
+	export = charm;
+}
+
+declare module 'dojo/node!charm/lib/encode' {
+	import * as encode from 'charm/lib/encode';
+	export = encode;
+}
+
 declare module 'dojo/node!istanbul' {
 	export * from 'istanbul';
 }
