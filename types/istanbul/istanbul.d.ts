@@ -172,6 +172,13 @@ declare module 'istanbul/lib/report/text' {
 	}
 }
 
+declare module 'istanbul/lib/report/text-summary' {
+	import Report from 'istanbul/lib/report';
+	export class TextSummaryReport extends Report {
+		constructor(opts?: any);
+	}
+}
+
 declare module 'istanbul/lib/report/json' {
 	import Report from 'istanbul/lib/report';
 

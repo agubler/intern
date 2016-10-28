@@ -18,6 +18,10 @@ declare module 'dojo/node!net' {
 	export * from 'net';
 }
 
+declare module 'dojo/node!stream' {
+	export * from 'stream';
+}
+
 declare module 'dojo/node!mimetype' {
 	export function lookup(input: string): (string|false);
 }
@@ -60,6 +64,10 @@ declare module 'dojo/node!istanbul/lib/report/text' {
 	export * from 'istanbul/lib/report/text';
 }
 
+declare module 'dojo/node!istanbul/lib/report/text-summary' {
+	export * from 'istanbul/lib/report/text-summary';
+}
+
 declare module 'dojo/node!istanbul/lib/report/lcovonly' {
 	export * from 'istanbul/lib/report/lcovonly';
 }
@@ -70,4 +78,8 @@ declare module 'dojo/has!host-node?dojo/node!istanbul/lib/collector' {
 
 declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/text' {
 	export * from 'istanbul/lib/report/text';
+}
+
+declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/text-summary' {
+	export * from 'istanbul/lib/report/text-summary';
 }
