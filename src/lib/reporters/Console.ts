@@ -2,8 +2,8 @@ import * as util from '../util';
 import * as has from 'dojo/has';
 import { Suite } from '../Suite';
 import { Test } from '../Test';
-import { Collector } from 'dojo/has!host-node?dojo/node!istanbul/lib/collector';
-import { TextReport as TextReporter } from 'dojo/has!host-node?dojo/node!istanbul/lib/report/text';
+import Collector = require('dojo/has!host-node?dojo/node!istanbul/lib/collector');
+import TextReporter = require('dojo/has!host-node?dojo/node!istanbul/lib/report/text');
 import { Reporter, ReporterConfig } from '../../interfaces';
 
 /**

@@ -7,8 +7,8 @@ import * as encode from 'charm/lib/encode';
 import * as nodeUtil from 'dojo/node!util';
 import * as lang from 'dojo/lang';
 import * as internUtil from '../util';
-import { Collector } from 'dojo/has!host-node?dojo/node!istanbul/lib/collector';
-import { TextReport } from 'dojo/has!host-node?dojo/node!istanbul/lib/report/text';
+import Collector = require('dojo/has!host-node?dojo/node!istanbul/lib/collector');
+import TextReport = require('dojo/has!host-node?dojo/node!istanbul/lib/report/text');
 
 export type Charm = charm.Charm;
 

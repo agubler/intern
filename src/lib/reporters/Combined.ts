@@ -5,11 +5,11 @@ import * as fs from 'dojo/node!fs';
 import { Suite } from '../Suite';
 import { Test } from '../Test';
 import { Reporter, ReporterConfig, ReporterOutput, Remote } from '../../interfaces';
-import { Collector } from 'dojo/node!istanbul/lib/collector';
-import { JsonReport as JsonReporter } from 'dojo/node!istanbul/lib/report/json';
-import { HtmlReport as LcovHtmlReporter } from 'dojo/node!istanbul/lib/report/html';
-import { TextReport as TextReporter } from 'dojo/node!istanbul/lib/report/text';
-import Report from 'istanbul/lib/report';
+import Collector = require('dojo/node!istanbul/lib/collector');
+import JsonReporter = require('dojo/node!istanbul/lib/report/json');
+import LcovHtmlReporter = require('dojo/node!istanbul/lib/report/html');
+import TextReporter = require('dojo/node!istanbul/lib/report/text');
+import Report = require('dojo/node!istanbul/lib/report');
 import * as Tunnel from 'digdug/Tunnel';
 
 class Combined implements Reporter {

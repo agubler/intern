@@ -18,10 +18,6 @@ declare module 'dojo/node!net' {
 	export * from 'net';
 }
 
-declare module 'dojo/node!stream' {
-	export * from 'stream';
-}
-
 declare module 'dojo/node!mimetype' {
 	export function lookup(input: string): (string|false);
 }
@@ -45,41 +41,56 @@ declare module 'dojo/node!istanbul' {
 }
 
 declare module 'dojo/node!istanbul/lib/collector' {
-	export * from 'istanbul/lib/collector';
+	import Collector = require('istanbul/lib/collector');
+	export = Collector;
+}
+
+declare module 'dojo/node!istanbul/lib/report' {
+	import Report = require('istanbul/lib/report');
+	export = Report;
 }
 
 declare module 'dojo/node!istanbul/lib/report/cobertura' {
-	export * from 'istanbul/lib/report/cobertura';
+	import CoberturaReport = require('istanbul/lib/report/cobertura');
+	export = CoberturaReport;
 }
 
 declare module 'dojo/node!istanbul/lib/report/json' {
-	export * from 'istanbul/lib/report/json';
+	import JsonReport = require('istanbul/lib/report/json');
+	export = JsonReport;
 }
 
 declare module 'dojo/node!istanbul/lib/report/html' {
-	export * from 'istanbul/lib/report/html';
+	import HtmlReport = require('istanbul/lib/report/html');
+	export = HtmlReport;
 }
 
 declare module 'dojo/node!istanbul/lib/report/text' {
-	export * from 'istanbul/lib/report/text';
+	import TextReport = require('istanbul/lib/report/text');
+	export = TextReport;
 }
 
 declare module 'dojo/node!istanbul/lib/report/text-summary' {
-	export * from 'istanbul/lib/report/text-summary';
+	import TextSummaryReport = require('istanbul/lib/report/text-summary');
+	export = TextSummaryReport;
 }
 
 declare module 'dojo/node!istanbul/lib/report/lcovonly' {
-	export * from 'istanbul/lib/report/lcovonly';
+	import LcovOnlyReport from 'istanbul/lib/report/lcovonly';
+	export = LcovOnlyReport;
 }
 
 declare module 'dojo/has!host-node?dojo/node!istanbul/lib/collector' {
-	export * from 'istanbul/lib/collector';
+	import Collector = require('istanbul/lib/collector');
+	export = Collector;
 }
 
 declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/text' {
-	export * from 'istanbul/lib/report/text';
+	import TextReport = require('istanbul/lib/report/text');
+	export = TextReport;
 }
 
 declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/text-summary' {
-	export * from 'istanbul/lib/report/text-summary';
+	import TextSummaryReport = require('istanbul/lib/report/text-summary');
+	export = TextSummaryReport;
 }

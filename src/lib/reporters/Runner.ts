@@ -1,8 +1,8 @@
 import * as charm from 'dojo/node!charm';
 import * as nodeUtil from 'dojo/node!util';
-import { Collector } from 'dojo/has!host-node?dojo/node!istanbul/lib/collector';
-import { TextSummaryReport } from 'dojo/has!host-node?dojo/node!istanbul/lib/report/text-summary';
-import { TextReport } from 'dojo/has!host-node?dojo/node!istanbul/lib/report/text';
+import Collector = require('dojo/has!host-node?dojo/node!istanbul/lib/collector');
+import TextSummaryReport = require('dojo/has!host-node?dojo/node!istanbul/lib/report/text-summary');
+import TextReport = require('dojo/has!host-node?dojo/node!istanbul/lib/report/text');
 import * as intern from '../../main';
 import * as util from '../util';
 import { Test } from '../Test';
