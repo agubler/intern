@@ -114,6 +114,7 @@ define([
 			var topicFired = false;
 			var actualTest;
 			var expectedTest = createTest({
+				name: 'BenchmarkTest#constructor topic',
 				reporterManagerEmit: function (topic, test) {
 					if (topic === 'newTest') {
 						topicFired = true;
@@ -121,7 +122,6 @@ define([
 					}
 				}
 			});
-			expectedTest.name = 'BenchmarkTest#constructor topic';
 			assert.isTrue(topicFired, 'newTest topic should fire after a test is created');
 			assert.strictEqual(actualTest, expectedTest,
 				'newTest topic should be passed the test that was just created');
@@ -154,6 +154,45 @@ define([
 			return test.run().then(function () {
 				assert.isAbove(runCount, 1, 'test should have run more than once');
 				assert.isTrue(onStartCalled, 'Benchmark#onStart should have been called');
+			});
+		},
+
+		'BenchmarkTest#testPass topic': function () {
+			var topicFired = false;
+			var executionCount = 0;
+			var actualTest;
+			var actualBenchmarks;
+			var expectedTest = createTest({
+				reporterManagerEmit: function (topic, test, benchmarks) {
+					if (topic === 'testPass') {
+						topicFired = true;
+						actualTest = test;
+						actualBenchmarks = benchmarks;
+					}
+				},
+				test: getTestFunction(function () {
+					executionCount++;
+				}, true)
+			});
+
+			return expectedTest.run().then(function () {
+				assert.isTrue(topicFired, 'testPass topic should fire after a test is successfully run');
+				assert.strictEqual(actualTest, expectedTest,
+					'testPass topic should be passed the test that was just run');
+				assert.property(actualBenchmarks, 'hz');
+				assert.property(actualBenchmarks, 'times');
+				assert.deepProperty(actualBenchmarks, 'times.cycle');
+				assert.deepProperty(actualBenchmarks, 'times.elapsed');
+				assert.deepProperty(actualBenchmarks, 'times.period');
+				assert.deepProperty(actualBenchmarks, 'times.timeStamp');
+				assert.property(actualBenchmarks, 'stats');
+				assert.deepProperty(actualBenchmarks, 'stats.moe');
+				assert.deepProperty(actualBenchmarks, 'stats.rme');
+				assert.deepProperty(actualBenchmarks, 'stats.sem');
+				assert.deepProperty(actualBenchmarks, 'stats.deviation');
+				assert.deepProperty(actualBenchmarks, 'stats.mean');
+				assert.deepProperty(actualBenchmarks, 'stats.sample');
+				assert.deepProperty(actualBenchmarks, 'stats.variance');
 			});
 		},
 
@@ -202,13 +241,8 @@ define([
 					// Elapsed time is non-deterministic, so just force it to a value we can test
 					assert.isAbove(testJson.timeElapsed, 0);
 
-					// Check that a benchmark property exists and has values
-					assert.property(test, 'benchmark');
-					assert.isAbove(test.benchmark.hz, 0);
-
 					// Delete the values we don't want deepEqual with the expected values
 					delete testJson.timeElapsed;
-					delete testJson.benchmark;
 
 					assert.deepEqual(testJson, expected,
 						'Test#toJSON should return expected JSON structure for test with no error');

@@ -32,11 +32,11 @@ define([
 			},
 
 			nested1: function () {
-				return couter * 23;
+				return counter * 23;
 			},
 
 			nested2: function () {
-				return couter / 12;
+				return counter / 12;
 			}
 		},
 

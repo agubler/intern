@@ -279,7 +279,6 @@ define([
 				];
 				var expected = [
 					'intern-selftest/tests/unit/all',
-					'intern-selftest/tests/unit/benchmark',
 					'intern-selftest/tests/unit/main',
 					'intern-selftest/tests/unit/order'
 				];
