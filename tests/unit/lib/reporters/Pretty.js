@@ -2,10 +2,10 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/lib/reporters/Pretty',
-	'intern-selftest/lib/EnvironmentType',
-	'intern-selftest/lib/Suite',
-	'intern-selftest/lib/Test',
+	'../../../../dist/lib/reporters/Pretty',
+	'../../../../dist/lib/EnvironmentType',
+	'../../../../dist/lib/Suite',
+	'../../../../dist/lib/Test',
 	'./support/mocks',
 	'dojo/has!host-node?dojo/node!istanbul/lib/report/text'
 ], function (registerSuite, assert, { PrettyReporter: Pretty }, { EnvironmentType }, { Suite }, { Test }, mock, Reporter) {

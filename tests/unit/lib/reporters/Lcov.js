@@ -5,7 +5,7 @@ define([
 	'dojo/node!istanbul/lib/report/lcovonly',
 	'dojo/node!fs',
 	'./support/mocks',
-	'intern-selftest/lib/reporters/Lcov'
+	'../../../../dist/lib/reporters/Lcov'
 ], function (registerSuite, assert, Collector, Reporter, fs, mock, { LcovReporter: Lcov }) {
 	var sessionId = 'foo';
 

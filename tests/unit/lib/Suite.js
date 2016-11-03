@@ -1,8 +1,8 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/lib/Suite',
-	'intern-selftest/lib/Test',
+	'../../../dist/lib/Suite',
+	'../../../dist/lib/Test',
 	'dojo/Promise'
 ], function (registerSuite, assert, { Suite }, { Test }, Promise) {
 	function createAsyncAndPromiseTest(testWrapper) {

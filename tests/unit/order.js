@@ -12,8 +12,8 @@ define([
 				global = (new Function('return this'))();
 
 			require([
-				'intern-selftest/order!./data/order/1.js',
-				'intern-selftest/order!./data/order/2.js'
+				'../../dist/order!./data/order/1.js',
+				'../../dist/order!./data/order/2.js'
 			], dfd.callback(function () {
 				try {
 					assert.deepEqual(global.order, [ 1, 2 ],

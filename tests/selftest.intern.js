@@ -21,32 +21,25 @@ define({
 	loaderOptions: {
 		// Packages that should be registered with the loader in each testing environment
 		packages: [
-			{ name: 'intern-selftest', location: 'dist/' },
-			{ name: 'tests', location: 'tests' },
-			{ name: 'nm', location: 'node_modules' }
+			{ name: 'intern-selftest', location: '.' }
 		],
 		map: {
 			'intern-selftest': {
-				dojo: 'nm/dojo',
-				chai: 'nm/chai/chai',
-				diff: 'nm/diff/diff'
-			},
-			'tests': {
-				dojo: 'nm/dojo',
-				chai: 'nm/chai/chai',
-				diff: 'nm/diff/diff'
+				dojo: 'intern-selftest/node_modules/dojo',
+				chai: 'intern-selftest/node_modules/chai/chai',
+				diff: 'intern-selftest/node_modules/diff/diff'
 			}
 		}
 	},
 
 	suites: [
-		'tests/unit/all'
+		'intern-selftest/tests/unit/all'
 	],
 	functionalSuites: [
-		'tests/functional/lib/ProxiedSession'
+		'intern-selftest/tests/functional/lib/ProxiedSession'
 	],
 
-	excludeInstrumentation: true, // /(?:tests|node_modules)\//,
+	excludeInstrumentation: /(?:tests|node_modules)\//,
 
 	isSelfTestConfig: true
 });

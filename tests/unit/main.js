@@ -1,7 +1,7 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/main'
+	'../../dist/main'
 ], function (registerSuite, assert, main) {
 	registerSuite({
 		name: 'intern/main',

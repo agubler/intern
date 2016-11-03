@@ -2,10 +2,10 @@ define([
 	'intern!object',
 	'dojo/node!fs',
 	'intern/chai!assert',
-	'intern-selftest/lib/EnvironmentType',
-	'intern-selftest/lib/Suite',
-	'intern-selftest/lib/Test',
-	'intern-selftest/lib/reporters/JUnit',
+	'../../../../dist/lib/EnvironmentType',
+	'../../../../dist/lib/Suite',
+	'../../../../dist/lib/Test',
+	'../../../../dist/lib/reporters/JUnit',
 	'dojo/text!../../data/lib/reporters/JUnit/expected.xml'
 ], function (registerSuite, fs, assert, EnvironmentType, { Suite }, { Test }, { JUnit }, expected) {
 	registerSuite({

@@ -1,8 +1,8 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/main!tdd',
-	'intern-selftest/main!bdd'
+	'../../../../dist/main!tdd',
+	'../../../../dist/main!bdd'
 ], function (registerSuite, assert, tdd, bdd) {
 	registerSuite({
 		name: 'intern/lib/interfaces/bdd',

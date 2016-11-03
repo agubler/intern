@@ -1,8 +1,8 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/lib/ReporterManager',
-	'intern-selftest/lib/reporters/JUnit',
+	'../../../dist/lib/ReporterManager',
+	'../../../dist/lib/reporters/JUnit',
 	'dojo/Promise',
 	'dojo/has',
 	'dojo/has!host-node?dojo/node!fs',

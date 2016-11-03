@@ -2,8 +2,8 @@ define([
 	'intern!object',
 	'intern/chai!assert',
 	'dojo/Promise',
-	'intern-selftest/lib/resolveEnvironments',
-	'intern-selftest/lib/EnvironmentType'
+	'../../../dist/lib/resolveEnvironments',
+	'../../../dist/lib/EnvironmentType'
 ], function (registerSuite, assert, Promise, { resolveEnvironments }, { EnvironmentType }) {
 	var availableChrome = [
 		{ browserName: 'chrome', version: '39' },

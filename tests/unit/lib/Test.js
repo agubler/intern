@@ -1,8 +1,8 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/lib/Test',
-	'intern-selftest/lib/Suite',
+	'../../../dist/lib/Test',
+	'../../../dist/lib/Suite',
 	'dojo/Promise'
 ], function (registerSuite, assert, { Test }, { Suite }, Promise) {
 	function createTest(options) {

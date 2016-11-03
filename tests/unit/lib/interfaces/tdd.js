@@ -1,10 +1,10 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/main!tdd',
-	'intern-selftest/main',
-	'intern-selftest/lib/Suite',
-	'intern-selftest/lib/Test'
+	'../../../../dist/main!tdd',
+	'../../../../dist/main',
+	'../../../../dist/lib/Suite',
+	'../../../../dist/lib/Test'
 ], function (registerSuite, assert, tdd, main, s, t) {
 	var Suite = s.Suite;
 	var Test = t.Test;

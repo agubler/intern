@@ -1,7 +1,7 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/lib/EnvironmentType'
+	'../../../dist/lib/EnvironmentType'
 ], function (registerSuite, assert, { EnvironmentType }) {
 	registerSuite({
 		name: 'intern/lib/EnvironmentType',

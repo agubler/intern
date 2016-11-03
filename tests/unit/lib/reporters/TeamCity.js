@@ -2,10 +2,10 @@ define([
 	'intern!object',
 	'intern/chai!assert',
 	'./support/MockStream',
-	'intern-selftest/lib/Suite',
-	'intern-selftest/lib/Test',
-	'intern-selftest/lib/reporters/TeamCity',
-	'intern-selftest/lib/util'
+	'../../../../dist/lib/Suite',
+	'../../../../dist/lib/Test',
+	'../../../../dist/lib/reporters/TeamCity',
+	'../../../../dist/lib/util'
 ], function (registerSuite, assert, MockStream, { Suite }, { Test }, { TeamCity }, util) {
 	var messagePatterns = {
 		suiteStart: '^##teamcity\\[testSuiteStarted name=\'{id}\'',

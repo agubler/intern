@@ -1,12 +1,12 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/main!tdd',
-	'intern-selftest/main!qunit',
-	'intern-selftest/main',
-	'intern-selftest/lib/executors/Executor',
-	'intern-selftest/lib/Suite',
-	'intern-selftest/lib/Test'
+	'../../../../dist/main!tdd',
+	'../../../../dist/main!qunit',
+	'../../../../dist/main',
+	'../../../../dist/lib/executors/Executor',
+	'../../../../dist/lib/Suite',
+	'../../../../dist/lib/Test'
 ], function (registerSuite, assert, tdd, { QUnit }, main, { Executor }, { Suite }, { Test }) {
 	var originalExecutor;
 	var rootSuite;

@@ -2,7 +2,7 @@ define([
 	'require',
 	'intern!object',
 	'intern/chai!assert',
-	'intern-selftest/lib/Proxy',
+	'../../../dist/lib/Proxy',
 	'dojo/Promise',
 	'dojo/node!fs',
 	'dojo/node!querystring'
@@ -92,7 +92,7 @@ define([
 			proxy.server = true;
 
 			var dfd = new Promise.Deferred();
-			var url = require.toUrl('intern-selftest/lib/util.js');
+			var url = require.toUrl('../../../dist/lib/util.js');
 			var expected = fs.readFileSync(url, { encoding: 'utf8' });
 			var request = createRequest();
 
