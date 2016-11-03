@@ -9,29 +9,25 @@ import { Executor } from '../../lib/executors/Executor';
  * different incompatible JUnit/xUnit XSDs as possible into one reporter.
  */
 
+/**
+ * Simple XML generator.
+ * @constructor
+ * @param {string} nodeName The node name.
+ * @param {Object?} attributes Optional attributes.
+ */
 class XmlNode {
-	nodeName: string;
-	childNodes: XmlNode[];
+	nodeName: string = '';
+	childNodes: any[] = [];
 	attributes: any;
 
-	/**
-	 * Simple XML generator.
-	 * @constructor
-	 * @param {string} nodeName The node name.
-	 * @param {Object?} attributes Optional attributes.
-	 */
-	constructor(nodeName: string, attributes: any = {}) {
+	constructor(nodeName: string, attributes?: any) {
 		this.nodeName = nodeName;
 
-		if (attributes.childNodes) {
+		if (attributes && attributes.childNodes) {
 			this.childNodes = attributes.childNodes;
 			attributes.childNodes = undefined;
 		}
-		else {
-			this.childNodes = [];
-		}
-
-		this.attributes = attributes;
+		this.attributes = attributes || {};
 	}
 
 	/**
@@ -41,42 +37,46 @@ class XmlNode {
 	 * @param {(XmlNode|string)[]?} childNodes Optional child nodes for the new node.
 	 * @returns {XmlNode} A new node.
 	 */
-	createNode(nodeName: string, attributes: Object = {}): XmlNode {
-		let node = new XmlNode(nodeName, attributes);
+	createNode(nodeName: string, attributes: Object): XmlNode {
+		const node = new XmlNode(nodeName, attributes);
 		this.childNodes.push(node);
 		return node;
 	}
 
-	private _escape(str: string): string {
-		return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+	_escape(str: string): string {
+		return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 	}
 
-	private _serializeAttributes(): string {
+	_serializeAttributes(): string {
 		const attributes = this.attributes;
-		const nodes: string[] = [];
+		const nodes: any[] = [];
 
 		for (let key in attributes) {
 			if (attributes[key] != null) {
-				nodes.push(`${key}="${this._escape(attributes[key])}"`);
+				nodes.push(key + '="' + this._escape(attributes[key]) + '"');
 			}
 		}
 
 		return nodes.length ? ' ' + nodes.join(' ') : '';
 	}
 
-	private _serializeContent(): string {
+	_serializeContent(): string {
 		const nodeList = this.childNodes;
-		const nodes: string[] = [];
-
-		for (let node of nodeList) {
-			nodes.push(typeof node === 'string' ? this._escape(node) : node.toString());
+		const nodes: any[] = [];
+		for (let i = 0, j = nodeList.length; i < j; ++i) {
+			nodes.push(typeof nodeList[i] === 'string' ? this._escape(nodeList[i]) : nodeList[i].toString());
 		}
 
 		return nodes.join('');
 	}
 
-	toString(): string {
+	/**
+	 * Outputs the node as a serialised XML string.
+	 * @returns {string}
+	 */
+	toString() {
 		const children = this._serializeContent();
+
 		return '<' + this.nodeName + this._serializeAttributes() +
 			(children.length ? '>' + children + '</' + this.nodeName + '>' : '/>');
 	}
@@ -93,7 +93,7 @@ function createSuiteNode(suite: Suite): XmlNode {
 	});
 }
 
-function createTestNode(test: Suite | Test): XmlNode {
+function createTestNode(test: Suite|Test): XmlNode {
 	if (test instanceof Suite) {
 		return createSuiteNode(test);
 	}
@@ -126,10 +126,13 @@ export class JUnit implements Reporter {
 		this.output = config.output;
 	}
 
-	runEnd(executor: Executor): void {
+	runEnd(executor: Executor) {
 		const rootNode = new XmlNode('testsuites');
-		executor.suites.forEach(suite => rootNode.childNodes.push(createSuiteNode(suite)));
-		const report = `<?xml version="1.0" encoding="UTF-8" ?>${rootNode.toString()}`;
+		executor.suites.forEach(function (suite) {
+			rootNode.childNodes.push(createSuiteNode(suite));
+		});
+
+		const report = '<?xml version="1.0" encoding="UTF-8" ?>' + rootNode.toString() + '\n';
 		this.output.end(report);
 	}
 }

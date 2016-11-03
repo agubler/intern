@@ -1,5 +1,5 @@
 import Collector = require('dojo/node!istanbul/lib/collector');
-import LcovOnlyReport = require('istanbul/lib/report/lcovonly');
+import LcovOnlyReport = require('dojo/node!istanbul/lib/report/lcovonly');
 import { Reporter, ReporterConfig } from '../../interfaces';
 
 export class LcovReporter implements Reporter {

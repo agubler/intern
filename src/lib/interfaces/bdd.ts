@@ -1,1 +1,1 @@
-export { test as describe, suite as it, before, after, beforeEach, afterEach } from './tdd';
+export { suite as describe, test as it, before, after, beforeEach, afterEach } from './tdd';

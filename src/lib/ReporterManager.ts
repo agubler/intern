@@ -7,9 +7,9 @@ import * as aspect from 'dojo/aspect';
 import * as Promise from 'dojo/Promise';
 
 // Node modules
-import * as fs from 'fs';
-import * as pathUtil from 'path';
-import * as istanbulDefaults from 'istanbul/lib/report/common/defaults';
+import * as fs from 'dojo/node!fs';
+import * as pathUtil from 'dojo/node!path';
+import * as istanbulDefaults from 'dojo/node!istanbul/lib/report/common/defaults';
 import { Watermarks } from 'istanbul';
 
 export interface ReporterConfig {

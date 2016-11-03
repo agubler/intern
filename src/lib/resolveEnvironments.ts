@@ -75,7 +75,7 @@ function resolveVersionAlias(version: string, availableVersions: string[]) {
 	if (pieces.length > 2) {
 		throw new Error('Invalid alias syntax "' + version + '"');
 	}
-		
+
 	pieces = pieces.map(function (piece) {
 		return piece.trim();
 	});
@@ -88,9 +88,9 @@ function resolveVersionAlias(version: string, availableVersions: string[]) {
 	}
 
 	if (pieces[0] === 'latest') {
-		var offset = pieces.length === 2 ? Number(pieces[1]) : 0;
+		let offset = pieces.length === 2 ? Number(pieces[1]) : 0;
 		if (offset > availableVersions.length) {
-			var message = 'Can\'t get ' + version + '; ' + availableVersions.length + ' version';
+			let message = 'Can\'t get ' + version + '; ' + availableVersions.length + ' version';
 			message += (availableVersions.length !== 1 ? 's are' : ' is') + ' available';
 			throw new Error(message);
 		}
@@ -113,7 +113,7 @@ function splitVersions(versionSpec: string) {
 	if (versions.length > 2) {
 		throw new Error('Invalid version syntax');
 	}
-		
+
 	return versions.map(function (version) {
 		return version.trim();
 	});
@@ -139,7 +139,7 @@ function getVersions(environment: Environment, available: ServiceEnvironment[]):
 	}).forEach(function (availableEnvironment) {
 		versions[availableEnvironment.version] = true;
 	});
-		
+
 	return Object.keys(versions).sort(ascendingNumbers);
 }
 
@@ -151,14 +151,14 @@ function getVersions(environment: Environment, available: ServiceEnvironment[]):
  * @param available a list of environment available on the target service
  * @returns the environment with resolved version aliases
  */
-function resolveVersions(environment: FlatEnvironment, available: ServiceEnvironment[]): string[] {
+function resolveVersions(environment: FlatEnvironment, available: ServiceEnvironment[]): string|string[] {
 	let versionSpec = environment.version;
 	let versions: string[];
 	available = available || [];
-	
+
 	if (versionSpec && isNaN(Number(versionSpec))) {
-		var availableVersions = getVersions(environment, available);
-		
+		let availableVersions = getVersions(environment, available);
+
 		versions = splitVersions(versionSpec).map(function (version) {
 			return resolveVersionAlias(version, availableVersions);
 		});
@@ -167,12 +167,14 @@ function resolveVersions(environment: FlatEnvironment, available: ServiceEnviron
 			if (versions[0] > versions[1]) {
 				throw new Error('Invalid range [' + versions + '], must be in ascending order');
 			}
-		
+
 			versions = expandVersionRange(versions[0], versions[1], availableVersions);
 		}
+
+		return versions;
 	}
 
-	return versions;
+	return versionSpec;
 }
 
 /**

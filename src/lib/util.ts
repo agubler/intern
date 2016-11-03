@@ -1,6 +1,6 @@
-import { EnvironmentType } from './EnvironmentType'
-import * as intern from '../main'
-import * as diffUtil from 'diff'
+import { EnvironmentType } from './EnvironmentType';
+import * as intern from '../main';
+import * as diffUtil from 'diff';
 
 // AMD imports
 import * as has from 'dojo/has';
@@ -9,11 +9,11 @@ import * as Promise from 'dojo/Promise';
 import { IRequire, IRequireCallback } from 'dojo/loader';
 
 // Node imports
-import * as fs from 'fs';
-import * as glob from 'glob';
-import * as pathUtil from 'path';
-import { hook, Instrumenter } from 'istanbul';
-import { SourceMapConsumer, MappingItem } from 'source-map';
+import fs = require('dojo/node!fs');
+import glob = require('dojo/node!glob');
+import pathUtil = require('dojo/node!path');
+import { hook, Instrumenter } from 'dojo/node!istanbul';
+import { SourceMapConsumer, MappingItem } from 'dojo/node!source-map';
 
 declare const require: IRequire;
 

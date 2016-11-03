@@ -1,36 +1,24 @@
 import * as aspect from 'dojo/aspect';
 import * as main from '../../main';
 import { Suite, SuiteConfig, SuiteLifecycleFunction } from '../Suite';
-import { Test, TestFunction } from '../Test';
+import { Test } from '../Test';
 
 export interface ObjectSuiteConfig extends SuiteConfig {
 	after?: SuiteLifecycleFunction;
 	before?: SuiteLifecycleFunction;
 }
 
-export function registerSuite(mainConfig: ObjectSuiteConfig) {
-	main.executor.register(function (suite) {
-		let config = mainConfig;
-
-		// enable per-suite closure, to match feature parity with other interfaces like tdd/bdd more closely;
-		// without this, it becomes impossible to use the object interface for functional tests since there is no
-		// other way to create a closure for each main suite
-		if (typeof config === 'function') {
-			config = config();
-		}
-
-		_registerSuite(config, suite);
-	});
-};
-
-function _registerSuite(config: ObjectSuiteConfig, parentSuite: Suite) {
+function _registerSuite(descriptor: ObjectSuiteConfig, parentSuite: Suite): void {
 	/* jshint maxcomplexity: 13 */
-	const suite = new Suite({ parent: parentSuite });
-	const tests = suite.tests;
+	let suite = new Suite({ parent: parentSuite });
+	let tests = suite.tests;
+	let test: any;
 
 	parentSuite.tests.push(suite);
 
-	for (let k in config) {
+	for (let k in descriptor) {
+		test = descriptor[k];
+
 		if (k === 'before') {
 			k = 'setup';
 		}
@@ -40,32 +28,38 @@ function _registerSuite(config: ObjectSuiteConfig, parentSuite: Suite) {
 
 		switch (k) {
 		case 'name':
-			suite.name = config.name;
-			break;
 		case 'timeout':
-			suite.timeout = config.timeout;
+			(<{ [key: string]: any }> suite)[k] = test;
 			break;
 		case 'setup':
-			aspect.on(suite, 'setup', config.setup);
-			break;
 		case 'beforeEach':
-			aspect.on(suite, 'beforeEach', config.beforeEach);
-			break;
 		case 'afterEach':
-			aspect.on(suite, 'afterEach', config.afterEach);
-			break;
 		case 'teardown':
-			aspect.on(suite, 'teardown', config.teardown);
+			aspect.on(suite, k, test);
 			break;
 		default:
-			let testOrSuite = config[k];
-			if (typeof testOrSuite !== 'function') {
-				testOrSuite.name = testOrSuite.name || k;
-				_registerSuite(testOrSuite, suite);
+			if (typeof test !== 'function') {
+				test.name = test.name || k;
+				_registerSuite(test, suite);
 			}
 			else {
-				tests.push(new Test({ name: k, test: testOrSuite, parent: suite }));
+				tests.push(new Test({ name: k, test: test, parent: suite }));
 			}
 		}
 	}
+}
+
+export function registerSuite(mainDescriptor: ObjectSuiteConfig): void {
+	main.executor.register(function (suite: Suite) {
+		let descriptor = mainDescriptor;
+
+		// enable per-suite closure, to match feature parity with other interfaces like tdd/bdd more closely;
+		// without this, it becomes impossible to use the object interface for functional tests since there is no
+		// other way to create a closure for each main suite
+		if (typeof descriptor === 'function') {
+			descriptor = descriptor();
+		}
+
+		_registerSuite(descriptor, suite);
+	});
 }

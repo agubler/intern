@@ -3,7 +3,7 @@ import { Suite } from '../Suite';
 import { Test } from '../Test';
 import * as Tunnel from 'digdug/Tunnel';
 import * as charm from 'dojo/node!charm';
-import * as encode from 'charm/lib/encode';
+import * as encode from 'dojo/node!charm/lib/encode';
 import * as nodeUtil from 'dojo/node!util';
 import * as lang from 'dojo/lang';
 import * as internUtil from '../util';
@@ -129,6 +129,7 @@ export class PrettyReporter implements Reporter {
 	tunnelState: string;
 	charm: Charm;
 	private _renderTimeout: NodeJS.Timer;
+	private _Report = Report;
 
 	constructor(config: PrettyReporterConfig = {}) {
 		this.internConfig = config.internConfig;

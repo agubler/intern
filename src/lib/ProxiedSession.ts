@@ -1,11 +1,10 @@
-import * as lang from 'dojo/lang';
 import * as Promise from 'dojo/Promise';
 
-import Session = require('leadfoot/Session');
+import Session = require('dojo/node!leadfoot/Session');
 
 /* istanbul ignore next: client-side code */
 function getCoverageData(coverageVariable: string) {
-	var coverageData = (function (this: any) { return this; })()[coverageVariable];
+	let coverageData = (function (this: any) { return this; })()[coverageVariable];
 	return coverageData && JSON.stringify(coverageData);
 }
 
@@ -67,7 +66,7 @@ export class ProxiedSession extends Session {
 		}
 
 		if (this.coverageEnabled) {
-			var promise: Promise<any>;
+			let promise: Promise<any>;
 
 			// At least Safari will not inject user scripts for non http/https URLs, so we can't get coverage data.
 			if (this.capabilities.brokenExecuteForNonHttpUrl) {
@@ -127,7 +126,7 @@ export class ProxiedSession extends Session {
 			// A heartbeat command is sent immediately when the interval is set because it is unknown how long ago
 			// the last command was sent and it simplifies the implementation by requiring only one call to
 			// `setTimeout`
-			var self = this;
+			const self = this;
 			(function sendHeartbeat() {
 				let timeoutId: number;
 				let cancelled = false;

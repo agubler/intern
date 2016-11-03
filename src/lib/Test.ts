@@ -11,6 +11,7 @@ export interface TestDescriptor {
 	name: string;
 	parent: Suite;
 	test: TestFunction;
+	hasPassed?: boolean;
 }
 
 export class Test {
@@ -24,7 +25,7 @@ export class Test {
 
 	timeElapsed: number;
 
-	hasPassed = false;
+	hasPassed: boolean = false;
 
 	skipped: string;
 
@@ -41,9 +42,9 @@ export class Test {
 	private _usesRemote = false;
 
 	constructor(descriptor: TestDescriptor) {
-		this.name = descriptor.name;
-		this.parent = descriptor.parent;
-		this.test = descriptor.test;
+		for (let key in descriptor) {
+			(<{ [key: string]: any }> this)[key] = (<{ [key: string]: any }> descriptor)[key];
+		}
 		this.reporterManager && this.reporterManager.emit('newTest', this);
 	}
 
@@ -152,7 +153,7 @@ export class Test {
 			clearTimeout(this._timer);
 			const timer = setTimeout(() => {
 				if (this._runTask) {
-					var reason = new Error('Timeout reached on ' + this.id);
+					let reason = new Error('Timeout reached on ' + this.id);
 					reason.name = 'CancelError';
 					this._runTask.cancel(reason);
 				}
@@ -179,7 +180,7 @@ export class Test {
 
 		function report(eventName: string) {
 			if (reporterManager) {
-				var args = [ eventName, self ].concat(Array.prototype.slice.call(arguments, 1));
+				let args = [ eventName, self ].concat(Array.prototype.slice.call(arguments, 1));
 				return reporterManager.emit.apply(reporterManager, args).catch(function () {});
 			}
 			else {
@@ -203,7 +204,7 @@ export class Test {
 
 		return start()
 			.then(function () {
-				var result = self.test();
+				let result = self.test();
 
 				// Someone called `this.async`, so this test is async; we have to prefer one or the other, so
 				// prefer the promise returned from the test function if it exists, otherwise get the one that was
@@ -226,7 +227,7 @@ export class Test {
 							// order to ensure that a timed out test is never accidentally resolved, always throw
 							// or re-throw the cancel reason
 							if (result.cancel) {
-								var returnValue = result.cancel(reason);
+								let returnValue = result.cancel(reason);
 								if (returnValue && returnValue.finally) {
 									return returnValue.finally(function () {
 										throw reason;
@@ -292,28 +293,24 @@ export class Test {
 				name: this.error.name,
 				message: this.error.message,
 				stack: this.error.stack,
-				showDiff: undefined,
-				actual: undefined,
-				expected: undefined
+				showDiff: !!this.error.showDiff
 			};
 
-			const thisError: any = <any> this.error;
-			if (thisError.showDiff) {
-				error.showDiff = thisError.showDiff;
-				error.actual = thisError.actual;
-				error.expected = thisError.expected;
+			if (this.error.showDiff) {
+				error.actual = this.error.actual;
+				error.expected = this.error.expected;
 			}
 		}
 
 		return {
+			error: error,
+			id: this.id,
 			name: this.name,
 			sessionId: this.sessionId,
-			id: this.id,
-			timeout: this.timeout,
 			timeElapsed: this.timeElapsed,
+			timeout: this.timeout,
 			hasPassed: this.hasPassed,
-			skipped: this.skipped,
-			error: error
+			skipped: this.skipped
 		};
 	}
 }

@@ -7,15 +7,15 @@ import { Executor } from './Executor';
 import * as aspect from 'dojo/aspect';
 import * as has from 'dojo/has';
 import * as lang from 'dojo/lang';
-import * as Promsie from 'dojo/Promise';
+import * as Promise from 'dojo/Promise';
 import { IRequire, IConfig } from 'dojo/loader';
 
 // Browser modules
-import * as request from 'dojo/request';
-import * as ioQuery from 'dojo/io-query';
+import * as request from 'dojo/has!host-browser?dojo/request';
+import * as ioQuery from 'dojo/has!host-browser?dojo/io-query';
 
 // Node modules
-import * as pathUtil from 'path';
+import * as pathUtil from 'dojo/has!host-node?dojo/node!path';
 
 // Legacy imports
 import main = require('../../main');
@@ -47,7 +47,7 @@ export class PreExecutor {
 	constructor(kwArgs: ExecutorOptions) {
 		this.defaultLoaderOptions = kwArgs.defaultLoaderOptions;
 
-		var executorId = kwArgs.executorId;
+		let executorId = kwArgs.executorId;
 		if (executorId.indexOf('/') === -1) {
 			executorId = executorId.charAt(0).toUpperCase() + executorId.slice(1);
 			executorId = require.toAbsMid('./' + executorId);
@@ -102,7 +102,7 @@ export class PreExecutor {
 
 		util.assertSafeModuleId(moduleId);
 
-		var promise = util.getModule(
+		let promise = util.getModule(
 			this.defaultLoaderOptions.baseUrl.replace(/\/?$/, '/' + moduleId.replace(/(?:\.js)?$/, '.js'))
 		).then((config) => {
 			/* jshint maxcomplexity:20 */
@@ -153,7 +153,7 @@ export class PreExecutor {
 			}
 			else if (has('host-browser')) {
 				(function () {
-					var defaultBasePath = config.initialBaseUrl ||
+					let defaultBasePath = config.initialBaseUrl ||
 						// replacing `/node_modules/intern/client.html` with `/`, allowing for directory name
 						// derivatives
 						util.normalizePath(location.pathname.replace(/(?:\/+[^\/]*){3}\/?$/, '/'));
@@ -195,7 +195,7 @@ export class PreExecutor {
 				config.grep = new RegExp('');
 			}
 			else {
-				var grep = /^\/(.*)\/([gim]*)$/.exec(config.grep);
+				let grep = /^\/(.*)\/([gim]*)$/.exec(config.grep);
 
 				if (grep) {
 					config.grep = new RegExp(grep[1], grep[2]);
@@ -245,8 +245,8 @@ export class PreExecutor {
 				sendErrorToConduit(error);
 			}
 
-			var htmlError = util.getErrorMessage(error).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-			var errorNode = document.createElement('div');
+			let htmlError = util.getErrorMessage(error).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+			let errorNode = document.createElement('div');
 			errorNode.style.cssText = 'color: red; font-family: sans-serif;';
 			errorNode.innerHTML = '<h1>Fatal error during pre-execution stage</h1>' +
 				'<pre style="padding: 1em; background-color: #f0f0f0;">' + htmlError + '</pre>';
@@ -378,8 +378,8 @@ export class PreExecutor {
 			}
 			// Only try to g
 			else if (has('host-browser') && config.suites.some(util.isGlobModuleId)) {
-				var query = ioQuery.objectToQuery({ suites: JSON.stringify(config.suites) });
-				var url = require.toUrl('intern/__resolveSuites__') + '?' + query;
+				let query = ioQuery.objectToQuery({ suites: JSON.stringify(config.suites) });
+				let url = require.toUrl('intern/__resolveSuites__') + '?' + query;
 
 				promise = request(url, {
 					method: 'GET'
@@ -415,7 +415,7 @@ export class PreExecutor {
 			return self.swapLoader(config.basePath, config.loaders, config.loaderOptions);
 		}
 
-		var promise = Promise.resolve()
+		let promise = Promise.resolve()
 			.then(getConfig)
 			.then(swapLoader)
 			.then(resolveSuites)
@@ -424,7 +424,7 @@ export class PreExecutor {
 			.then(runExecutor)
 			.catch(function (error) {
 				// a fatal error hasn't been reported -- ensure the user is notified
-				if (!error.reported) {
+				if (!(<any> error).reported) {
 					earlyErrorHandler(error);
 				}
 				throw error;
@@ -449,7 +449,7 @@ export class PreExecutor {
 
 		return new Promise(function (resolve, reject) {
 			if (has('host-node') && loaders['host-node']) {
-				var require = _global.require.nodeRequire;
+				let require = _global.require.nodeRequire;
 
 				// Someone is attempting to use the loader module that has already been loaded. If we were to try
 				// loading again without deleting it from `require.cache`, Node.js would not re-execute the loader
@@ -463,16 +463,16 @@ export class PreExecutor {
 
 				_global.require = _global.define = undefined;
 
-				var id = loaders['host-node'];
-				var moduleUtil = require('module');
+				let id = loaders['host-node'];
+				let moduleUtil = require('module');
 				if (moduleUtil._findPath && moduleUtil._nodeModulePaths) {
-					var localModulePath = moduleUtil._findPath(id, moduleUtil._nodeModulePaths(basePath));
+					let localModulePath = moduleUtil._findPath(id, moduleUtil._nodeModulePaths(basePath));
 					if (localModulePath !== false) {
 						id = localModulePath;
 					}
 				}
 
-				var amdRequire = require(id);
+				let amdRequire = require(id);
 
 				// The Dojo 1 loader does not export itself, it only exposes itself globally; in this case
 				// `amdRequire` is an empty object, not a function. Other loaders return themselves and do not
@@ -490,7 +490,7 @@ export class PreExecutor {
 			}
 			else if (has('host-browser') && loaders['host-browser']) {
 				_global.require = _global.define = undefined;
-				var script = document.createElement('script');
+				let script = document.createElement('script');
 				script.onload = function () {
 					this.onload = this.onerror = null;
 					resolve(_global.curl || _global.requirejs || _global.require);
@@ -501,7 +501,7 @@ export class PreExecutor {
 					reject(new Error('Failed to load AMD loader from ' + script.src));
 				};
 
-				var loaderUrl = loaders['host-browser'];
+				let loaderUrl = loaders['host-browser'];
 				if (!util.isAbsoluteUrl(loaderUrl)) {
 					loaderUrl = basePath + loaderUrl;
 				}

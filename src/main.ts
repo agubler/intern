@@ -18,13 +18,13 @@ export let config: Config;
 /**
  * The executor for the current test run.
  */
-export let executor: Executor;
+export let executor: Executor = null;
 
 /**
  * AMD plugin API interface for easy loading of test interfaces.
  */
 export function load(id: string, pluginRequire: IRequire, callback: (module: string) => void) {
-	pluginRequire([ './lib/interfaces/' + id ], callback);
+	require([ './lib/interfaces/' + id ], callback);
 }
 
 export function normalize(interfaceId: string) {

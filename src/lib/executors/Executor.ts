@@ -15,7 +15,7 @@ import { IRequire } from 'dojo/loader';
 
 declare const require: IRequire;
 
-const globalOrWindow = (function (this: any) { return this; })();
+const globalOrWindow = Function('return this')();
 
 export class Executor {
 	/** The resolved configuration for this executor. */
@@ -100,7 +100,7 @@ export class Executor {
 			return self._runTests(self.config.maxConcurrency);
 		}
 
-		var promise = this._beforeRun()
+		const promise = this._beforeRun()
 			.then(function () {
 				return runConfigSetup().then(function () {
 					return emitRunStart()
@@ -321,9 +321,9 @@ export class Executor {
 			});
 
 			function emitLocalCoverage() {
-				var error = new Error('Run failed due to one or more suite errors');
+				let error = new Error('Run failed due to one or more suite errors');
 
-				var coverageData = globalOrWindow[self.config.instrumenterOptions.coverageVariable];
+				let coverageData = globalOrWindow[self.config.instrumenterOptions.coverageVariable];
 				if (coverageData) {
 					return self.reporterManager.emit('coverage', null, coverageData).then(function () {
 						if (hasError) {
@@ -344,7 +344,7 @@ export class Executor {
 
 			if (suites && suites.length) {
 				suites.forEach(queue(function (suite: Suite) {
-					var runTask = suite.run().then(finishSuite, function () {
+					let runTask = suite.run().then(finishSuite, function () {
 						hasError = true;
 						finishSuite();
 					});

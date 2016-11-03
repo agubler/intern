@@ -32,9 +32,9 @@ export interface SuiteConfig {
 export class Suite {
 	async: (timeout?: number) => Promise.Deferred<void>;
 
-	afterEach: TestLifecycleFunction;
+	afterEach: TestLifecycleFunction = null;
 
-	beforeEach: TestLifecycleFunction;
+	beforeEach: TestLifecycleFunction = null;
 
 	error: InternError;
 
@@ -381,7 +381,7 @@ export class Suite {
 					}
 
 					function runWithCatch() {
-						return runLifecycleMethod(suite, name, [ test ]);
+						return runLifecycleMethod(suite, name, test);
 					}
 
 					current = runWithCatch().then(next, handleError);

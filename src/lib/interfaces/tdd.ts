@@ -1,4 +1,4 @@
-import * as aspect from 'dojo/aspect';
+import { on } from 'dojo/aspect';
 import * as main from '../../main';
 import { Suite, SuiteLifecycleFunction } from '../Suite';
 import { Test, TestFunction } from '../Test';
@@ -23,7 +23,7 @@ export function suite(name: string, factory: TestFunction): void {
 			currentSuite = suite;
 			registerSuite(name, factory);
 			currentSuite = null;
-		})
+		});
 	} else {
 		registerSuite(name, factory);
 	}
@@ -33,18 +33,18 @@ export function test (name: string, test: TestFunction): void {
 	currentSuite.tests.push(new Test({ name, test, parent: currentSuite }));
 }
 
-export function before(fn: Function): void {
-	aspect.on(currentSuite, 'setup', fn);
+export function before(fn: SuiteLifecycleFunction): void {
+	on(currentSuite, 'setup', fn);
 }
 
-export function after(fn: Function): void {
-	aspect.on(currentSuite, 'teardown', fn);
+export function after(fn: SuiteLifecycleFunction): void {
+	on(currentSuite, 'teardown', fn);
 }
 
-export function beforeEach(fn: Function): void {
-	aspect.on(currentSuite, 'beforeEach', fn);
+export function beforeEach(fn: SuiteLifecycleFunction): void {
+	on(currentSuite, 'beforeEach', fn);
 }
 
-export function afterEach(fn: Function): void {
-	aspect.on(currentSuite, 'afterEach', fn);
+export function afterEach(fn: SuiteLifecycleFunction): void {
+	on(currentSuite, 'afterEach', fn);
 }

@@ -1,5 +1,19 @@
+declare module 'dojo/has!host-node?dojo/node!path' {
+	export * from 'path';
+}
+
 declare module 'dojo/node!path' {
 	export * from 'path';
+}
+
+declare module 'dojo/node!glob' {
+	import glob = require('glob');
+	export = glob;
+}
+
+declare module 'dojo/node!source-map' {
+	import sourceMap = require('source-map');
+	export = sourceMap;
 }
 
 declare module 'dojo/node!url' {
@@ -8,6 +22,21 @@ declare module 'dojo/node!url' {
 
 declare module 'dojo/node!fs' {
 	export * from 'fs';
+}
+
+declare module 'dojo/node!leadfoot/Session' {
+	import Session = require('leadfoot/Session');
+	export = Session;
+}
+
+declare module 'dojo/has!host-browser?dojo/request' {
+	import request = require('dojo/request');
+	export = request;
+}
+
+declare module 'dojo/has!host-browser?dojo/io-query' {
+	import ioQuery = require('dojo/io-query');
+	export = ioQuery;
 }
 
 declare module 'dojo/node!http' {
@@ -78,6 +107,10 @@ declare module 'dojo/node!istanbul/lib/report/text-summary' {
 declare module 'dojo/node!istanbul/lib/report/lcovonly' {
 	import LcovOnlyReport from 'istanbul/lib/report/lcovonly';
 	export = LcovOnlyReport;
+}
+
+declare module 'dojo/node!istanbul/lib/report/common/defaults' {
+	export * from 'istanbul/lib/report/common/defaults';
 }
 
 declare module 'dojo/has!host-node?dojo/node!istanbul/lib/collector' {
