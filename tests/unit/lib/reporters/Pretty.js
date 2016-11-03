@@ -2,13 +2,13 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'../../../../lib/reporters/Pretty',
-	'../../../../lib/EnvironmentType',
-	'../../../../lib/Suite',
-	'../../../../lib/Test',
+	'intern-selftest/lib/reporters/Pretty',
+	'intern-selftest/lib/EnvironmentType',
+	'intern-selftest/lib/Suite',
+	'intern-selftest/lib/Test',
 	'./support/mocks',
 	'dojo/has!host-node?dojo/node!istanbul/lib/report/text'
-], function (registerSuite, assert, Pretty, EnvironmentType, Suite, Test, mock, Reporter) {
+], function (registerSuite, assert, { PrettyReporter: Pretty }, { EnvironmentType }, { Suite }, { Test }, mock, Reporter) {
 	function bar(results) {
 		return results.map(function (result) {
 			return pretty.colorReplacement[result] || result;

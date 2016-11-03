@@ -1,10 +1,10 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'../../../lib/Test',
-	'../../../lib/Suite',
+	'intern-selftest/lib/Test',
+	'intern-selftest/lib/Suite',
 	'dojo/Promise'
-], function (registerSuite, assert, Test, Suite, Promise) {
+], function (registerSuite, assert, { Test }, { Suite }, Promise) {
 	function createTest(options) {
 		if (!options.parent) {
 			options.parent = {
@@ -220,7 +220,7 @@ define([
 				assert.deepEqual(test.toJSON(), expected,
 					'Test#toJSON should return expected JSON structure for test with no error');
 
-				test.error = expected.error = { name: 'Oops', message: 'message', stack: 'stack' };
+				test.error = expected.error = { name: 'Oops', message: 'message', stack: 'stack', showDiff: false };
 				assert.deepEqual(test.toJSON(), expected,
 					'Test#toJSON should return expected JSON structure for test with error not including diff info');
 

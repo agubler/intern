@@ -2,15 +2,15 @@ define([
 	'require',
 	'intern!object',
 	'intern/chai!assert',
-	'../../../../lib/parseArgs',
-	'../../../../lib/executors/PreExecutor'
-], function (require, registerSuite, assert, parseArgs, PreExecutor) {
+	'intern-selftest/lib/parseArgs',
+	'intern-selftest/lib/executors/PreExecutor'
+], function (require, registerSuite, assert, parseArgs, { PreExecutor }) {
 	registerSuite({
 		name: 'lib/executors/PreExecutor',
 
 		'#constructor - executorId': function () {
 			var executor = new PreExecutor({ executorId: 'runner' });
-			var runnerMid = require.toAbsMid('../../../../lib/executors/Runner');
+			var runnerMid = require.toAbsMid('intern-selftest/lib/executors/Runner');
 			assert.strictEqual(executor.executorId, runnerMid, 'Expected executorId to be a module ID');
 		},
 
@@ -87,7 +87,7 @@ define([
 					executor = new PreExecutor({
 						executorId: 'runner',
 						defaultLoaderOptions: {
-							baseUrl: 'intern-selftest'
+							baseUrl: 'tests'
 						}
 					});
 				},
@@ -101,7 +101,7 @@ define([
 				proxyUrl: {
 					'default': function () {
 						return executor.getConfig({
-							config: 'tests/unit/data/lib/executors/intern',
+							config: 'unit/data/lib/executors/intern',
 						}).then(function (config) {
 							loadedConfig = config;
 							assert.propertyVal(config, 'proxyPort', 9000);
@@ -111,7 +111,7 @@ define([
 
 					'proxyPort arg': function () {
 						return executor.getConfig({
-							config: 'tests/unit/data/lib/executors/intern',
+							config: 'unit/data/lib/executors/intern',
 							proxyPort: '9004'
 						}).then(function (config) {
 							loadedConfig = config;
@@ -122,7 +122,7 @@ define([
 
 					'invalid proxyPort': function () {
 						return executor.getConfig({
-							config: 'tests/unit/data/lib/executors/intern',
+							config: 'unit/data/lib/executors/intern',
 							proxyPort: '900q'
 						}).then(
 							function () {

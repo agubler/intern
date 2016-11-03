@@ -3,11 +3,11 @@ define([
 	'intern/chai!assert',
 	'dojo/lang',
 	'./support/MockConsole',
-	'../../../../lib/Suite',
-	'../../../../lib/Test',
-	'../../../../lib/reporters/Console',
+	'intern-selftest/lib/Suite',
+	'intern-selftest/lib/Test',
+	'intern-selftest/lib/reporters/Console',
 	'dojo/has!host-node?dojo/node!path'
-], function (registerSuite, assert, lang, MockConsole, Suite, Test, Console, pathUtil) {
+], function (registerSuite, assert, lang, MockConsole, { Suite }, { Test }, { Console }, pathUtil) {
 	registerSuite({
 		name: 'intern/lib/reporters/Console',
 

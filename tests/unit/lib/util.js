@@ -2,8 +2,8 @@ define([
 	'intern',
 	'intern!object',
 	'intern/chai!assert',
-	'../../../lib/util',
-	'../../../lib/EnvironmentType',
+	'intern-selftest/lib/util',
+	'intern-selftest/lib/EnvironmentType',
 	'dojo/has',
 	'dojo/Promise',
 	'require',
@@ -11,7 +11,7 @@ define([
 	'dojo/has!host-node?dojo/node!path',
 	'dojo/has!host-node?dojo/node!vm',
 	'dojo/has!host-node?dojo/node!istanbul/lib/hook'
-], function (intern, registerSuite, assert, util, EnvironmentType, has, Promise, require, fs, pathUtil, vm, hook) {
+], function (intern, registerSuite, assert, util, { EnvironmentType }, has, Promise, require, fs, pathUtil, vm, hook) {
 	/* jshint maxlen:140 */
 	registerSuite({
 		name: 'intern/lib/util',
@@ -126,7 +126,8 @@ define([
 				}));
 			},
 
-			'source map from file': function () {
+			'DEBUG source map from file': function () {
+				debugger;
 				if (!has('host-node')) {
 					this.skip('requires Node.js');
 				}
@@ -275,12 +276,12 @@ define([
 				}
 
 				var moduleIds = [
-					'intern-selftest/tests/unit/*'
+					'tests/unit/*'
 				];
 				var expected = [
-					'intern-selftest/tests/unit/all',
-					'intern-selftest/tests/unit/main',
-					'intern-selftest/tests/unit/order'
+					'tests/unit/all',
+					'tests/unit/main',
+					'tests/unit/order'
 				];
 				var actual = util.resolveModuleIds(moduleIds);
 				assert.deepEqual(actual, expected, 'Unexpected resolution for single-level glob');
@@ -292,10 +293,10 @@ define([
 				}
 
 				var moduleIds = [
-					'intern-selftest/tests/functional/**/*'
+					'tests/functional/**/*'
 				];
 				var expected = [
-					'intern-selftest/tests/functional/lib/ProxiedSession'
+					'tests/functional/lib/ProxiedSession'
 				];
 				var actual = util.resolveModuleIds(moduleIds);
 				assert.deepEqual(actual, expected, 'Unexpected resolution for multi-level glob');
@@ -307,7 +308,7 @@ define([
 				}
 
 				var moduleIds = [
-					'intern-selftest/tests/unit/lib/data/repoters/**/*'
+					'tests/unit/lib/data/repoters/**/*'
 				];
 				var expected = [];
 				var actual = util.resolveModuleIds(moduleIds);

@@ -2,19 +2,19 @@ define([
 	'intern!object',
 	'intern/chai!assert',
 	'dojo/Promise',
-	'../../../lib/resolveEnvironments',
-	'../../../lib/EnvironmentType'
-], function (registerSuite, assert, Promise, resolveEnvironments, EnvironmentType) {
+	'intern-selftest/lib/resolveEnvironments',
+	'intern-selftest/lib/EnvironmentType'
+], function (registerSuite, assert, Promise, { resolveEnvironments }, { EnvironmentType }) {
 	var availableChrome = [
-		{ browserName: 'chrome', version: 39 },
-		{ browserName: 'chrome', version: 38 },
-		{ browserName: 'chrome', version: 37 },
-		{ browserName: 'chrome', version: 36 }
+		{ browserName: 'chrome', version: '39' },
+		{ browserName: 'chrome', version: '38' },
+		{ browserName: 'chrome', version: '37' },
+		{ browserName: 'chrome', version: '36' }
 	];
 	var sortedChrome = availableChrome.slice().sort(versionSort);
 	var availableIe = [
-		{ browserName: 'ie', version: 11 },
-		{ browserName: 'ie', version: 10 }
+		{ browserName: 'ie', version: '11' },
+		{ browserName: 'ie', version: '10' }
 	];
 
 	function versionSort(a, b) {
@@ -34,7 +34,7 @@ define([
 
 	registerSuite({
 		name: 'commands/resolveEnvironments',
-		
+
 		'no version, is passed through': function () {
 			var environments = [ { browserName: 'chrome', platformVersion: '10' } ];
 			assertResolveEnvironments(environments, availableChrome, environments);
@@ -224,7 +224,7 @@ define([
 					];
 					assertResolve(base, sources, null, expected, 'their contents should be equal');
 				},
-				
+
 				'multiple everything': function () {
 					var base = { isCapabilities: true };
 					var sources = [
@@ -271,30 +271,30 @@ define([
 				var expected = [ { browserName: 'chrome', version: sortedChrome[0].version } ];
 				return assertResolveEnvironments(environments, availableChrome, expected);
 			},
-			
+
 			'latest-1 version alias': function () {
 				var environments = [ { browserName: 'chrome', version: 'latest-1' } ];
 				var expected = [ { browserName: 'chrome', version: sortedChrome[1].version } ];
 				return assertResolveEnvironments(environments, availableChrome, expected);
 			}
 		},
-		
+
 		'version ranges': {
 			'basic version range': function () {
 				var environments = [ { browserName: 'chrome', version: '38..39' } ];
 				var expected = [
-					{ browserName: 'chrome', version: 38 },
-					{ browserName: 'chrome', version: 39 }
+					{ browserName: 'chrome', version: '38' },
+					{ browserName: 'chrome', version: '39' }
 				];
 				return assertResolveEnvironments(environments, availableChrome, expected);
 			},
-			
+
 			'ranged number .. latest': function () {
 				var environments = [ { browserName: 'chrome', version: '37..latest' } ];
 				var expected = [
-					{ browserName: 'chrome', version: 37 },
-					{ browserName: 'chrome', version: 38 },
-					{ browserName: 'chrome', version: 39 }
+					{ browserName: 'chrome', version: '37' },
+					{ browserName: 'chrome', version: '38' },
+					{ browserName: 'chrome', version: '39' }
 				];
 				return assertResolveEnvironments(environments, availableChrome, expected);
 			},
@@ -302,9 +302,9 @@ define([
 			'ranged math latest-2..latest': function () {
 				var environments = [ { browserName: 'chrome', version: 'latest-2..latest' } ];
 				var expected = [
-					{ browserName: 'chrome', version: 37 },
-					{ browserName: 'chrome', version: 38 },
-					{ browserName: 'chrome', version: 39 }
+					{ browserName: 'chrome', version: '37' },
+					{ browserName: 'chrome', version: '38' },
+					{ browserName: 'chrome', version: '39' }
 				];
 				return assertResolveEnvironments(environments, availableChrome, expected);
 			},
@@ -313,14 +313,14 @@ define([
 				var available = [].concat(availableChrome, availableIe);
 				var environments = [ { browserName: ['chrome', 'ie'], version: 'latest-1..latest' } ];
 				var expected = [
-					{ browserName: 'chrome', version: 38 },
-					{ browserName: 'chrome', version: 39 },
-					{ browserName: 'ie', version: 10 },
-					{ browserName: 'ie', version: 11 }
+					{ browserName: 'chrome', version: '38' },
+					{ browserName: 'chrome', version: '39' },
+					{ browserName: 'ie', version: '10' },
+					{ browserName: 'ie', version: '11' }
 				];
 				return assertResolveEnvironments(environments, available, expected);
 			},
-			
+
 			'ranged math out of bounds; throws': function () {
 				var environments = [ { browserName: 'ie', version: '3..latest' } ];
 				assert.throws(function () {
@@ -328,7 +328,7 @@ define([
 				});
 			}
 		},
-		
+
 		'does not filter on properties not present in available environments': function () {
 			var environments = [
 				{
@@ -348,7 +348,7 @@ define([
 			];
 			return assertResolveEnvironments(environments, availableChrome, expected);
 		},
-		
+
 		'invalid range syntax': {
 			'multiple ranges': function () {
 				var environments = [ { browserName: 'ie', version: 'latest-2..latest-1..latest' } ];

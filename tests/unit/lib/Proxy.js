@@ -2,7 +2,7 @@ define([
 	'require',
 	'intern!object',
 	'intern/chai!assert',
-	'../../../lib/Proxy',
+	'intern-selftest/lib/Proxy',
 	'dojo/Promise',
 	'dojo/node!fs',
 	'dojo/node!querystring'
@@ -10,7 +10,7 @@ define([
 	require,
 	registerSuite,
 	assert,
-	Proxy,
+	{ Proxy },
 	Promise,
 	fs,
 	querystring
@@ -92,7 +92,7 @@ define([
 			proxy.server = true;
 
 			var dfd = new Promise.Deferred();
-			var url = require.toUrl('../../../lib/util.js');
+			var url = require.toUrl('intern-selftest/lib/util.js');
 			var expected = fs.readFileSync(url, { encoding: 'utf8' });
 			var request = createRequest();
 
@@ -130,15 +130,15 @@ define([
 			'valid package': function () {
 				var proxy = new Proxy();
 				var query = querystring.stringify({ suites: JSON.stringify([
-					'intern-selftest/tests/unit/*',
-					'intern-selftest/tests/functional/**/*',
+					'tests/unit/*',
+					'tests/functional/**/*',
 				]) });
 				var request = createRequest('/__intern/__resolveSuites__?' + query);
 				var expected = [
-					'intern-selftest/tests/unit/all',
-					'intern-selftest/tests/unit/main',
-					'intern-selftest/tests/unit/order',
-					'intern-selftest/tests/functional/lib/ProxiedSession'
+					'tests/unit/all',
+					'tests/unit/main',
+					'tests/unit/order',
+					'tests/functional/lib/ProxiedSession'
 				];
 				var response = createResponse();
 

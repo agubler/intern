@@ -1,13 +1,13 @@
 define([
 	'intern!object',
 	'intern/chai!assert',
-	'../../../lib/ReporterManager',
-	'../../../lib/reporters/JUnit',
+	'intern-selftest/lib/ReporterManager',
+	'intern-selftest/lib/reporters/JUnit',
 	'dojo/Promise',
 	'dojo/has',
 	'dojo/has!host-node?dojo/node!fs',
 	'dojo/has!host-node?dojo/node!path'
-], function (registerSuite, assert, ReporterManager, JUnit, Promise, has, fs, pathUtil) {
+], function (registerSuite, assert, { ReporterManager }, { JUnit }, Promise, has, fs, pathUtil) {
 	registerSuite({
 		name: 'intern/lib/ReporterManager',
 

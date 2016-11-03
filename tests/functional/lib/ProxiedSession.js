@@ -3,10 +3,10 @@ define([
 	'intern!object',
 	'intern/chai!assert',
 	'require',
-	'../../../lib/ProxiedSession',
+	'intern-selftest/lib/ProxiedSession',
 	'dojo/node!leadfoot/Server',
 	'dojo/Promise'
-], function (registerSuite, assert, require, ProxiedSession, Server, Promise) {
+], function (registerSuite, assert, require, { ProxiedSession }, Server, Promise) {
 	registerSuite(function () {
 		var proxyUrl = 'https://example.invalid/';
 		var proxyBasePathLength = require.toUrl('./').length;
