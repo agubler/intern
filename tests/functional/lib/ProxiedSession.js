@@ -3,7 +3,7 @@ define([
 	'intern!object',
 	'intern/chai!assert',
 	'require',
-	'intern-selftest/lib/ProxiedSession',
+	'../../../dist/lib/ProxiedSession',
 	'dojo/node!leadfoot/Server',
 	'dojo/Promise'
 ], function (registerSuite, assert, require, { ProxiedSession }, Server, Promise) {
