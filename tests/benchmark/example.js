@@ -46,6 +46,6 @@ define([
 			}), 200);
 		}),
 
-		skip1: skip('this test does nothing right now', function () {})
+		skip1: skip(function () {}, 'this test does nothing right now')
 	});
 });

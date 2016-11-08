@@ -199,7 +199,7 @@ define([
 		'BenchmarkTest#skip': function () {
 			var test1 = new BenchmarkTest({
 				name: 'skip 1',
-				test: BenchmarkTest.skip('foo', function () {})
+				test: BenchmarkTest.skip(function () {}, 'foo')
 			});
 			var test2 = new BenchmarkTest({
 				name: 'skip 2',
