@@ -291,10 +291,10 @@ registerSuite({
 			}
 
 			const moduleIds = [
-				'tests/functional/**/*'
+				'intern-selftest/dist/tests/functional/**/*'
 			];
 			const expected = [
-				'tests/functional/lib/ProxiedSession'
+				'intern-selftest/dist/tests/functional/lib/ProxiedSession'
 			];
 			const actual = util.resolveModuleIds(moduleIds);
 			assert.deepEqual(actual, expected, 'Unexpected resolution for multi-level glob');
