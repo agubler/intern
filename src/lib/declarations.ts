@@ -41,6 +41,11 @@ declare module 'dojo/node!leadfoot/Session' {
 	export = Session;
 }
 
+declare module 'dojo/node!leadfoot/Server' {
+	import Server = require('leadfoot/Server');
+	export = Server;
+}
+
 declare module 'dojo/has!host-browser?dojo/request' {
 	import request = require('dojo/request');
 	export = request;

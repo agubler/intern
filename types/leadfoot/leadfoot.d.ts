@@ -2338,7 +2338,7 @@ declare module 'leadfoot/Server' {
 		/**
 		 * Adds additional capabilities data on the `capabilities` key of the passed session.
 		 */
-		protected _fillCapabilities(session: Session): Session;
+		/* protected */ _fillCapabilities(session: Session): Session;
 
 		/**
 		 * Gets a list of all currently active remote control sessions on this server.
