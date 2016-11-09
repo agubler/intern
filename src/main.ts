@@ -39,3 +39,7 @@ export function normalize(interfaceId: string) {
 export let mode: ExecutionMode = null;
 
 export type ExecutionMode = 'client' | 'runner' | 'custom';
+
+export function setExecutor(ex?: Executor): void {
+	executor = ex;
+}

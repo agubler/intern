@@ -72,7 +72,7 @@ export class ReporterManager {
 	/**
 	 * Add a reporter to the list of managed reporters.
 	 */
-	add(Reporter: (ReporterConstructor|Object), config: ReporterConfig) {
+	add(Reporter: (ReporterConstructor|Object), config?: ReporterConfig) {
 		let reporter: any;
 
 		if (typeof Reporter === 'object') {

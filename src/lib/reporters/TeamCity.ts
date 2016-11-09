@@ -25,7 +25,7 @@ export class TeamCity implements Reporter {
 	 *
 	 * Based on Message.prototype.escape from teamcity-service-messages
 	 */
-	private _escapeString(str: string): string {
+	/* private */ _escapeString(str: string): string {
 		const replacer = /['\n\r\|\[\]\u0100-\uffff]/g;
 		const map = {
 			'\'': '|\'',

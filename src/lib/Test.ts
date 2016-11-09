@@ -1,6 +1,6 @@
 import * as Promise from 'dojo/Promise';
 import * as util from './util';
-import { InternError, Remote } from '../interfaces';
+import { InternError, Remote, Deferred } from '../interfaces';
 import { Suite } from './Suite';
 
 export interface TestFunction {
@@ -12,6 +12,7 @@ export interface TestDescriptor {
 	parent: Suite;
 	test: TestFunction;
 	hasPassed?: boolean;
+	skipped?: string;
 }
 
 export class Test {
@@ -107,7 +108,7 @@ export class Test {
 	 *
 	 * @returns {module:dojo/Promise.Deferred}
 	 */
-	async(timeout?: number, numCallsUntilResolution?: number) {
+	async(timeout?: number, numCallsUntilResolution?: number): Deferred<any> {
 		this.isAsync = true;
 
 		if (timeout != null) {
@@ -281,8 +282,8 @@ export class Test {
 	 *
 	 * @param message If provided, will be stored in this test's `skipped` property.
 	 */
-	skip(message: string) {
-		this.skipped = message || '';
+	skip(message: string = '') {
+		this.skipped = message;
 		throw Test.SKIP;
 	}
 

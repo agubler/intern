@@ -3,8 +3,8 @@ import LcovOnlyReport = require('dojo/node!istanbul/lib/report/lcovonly');
 import { Reporter, ReporterConfig } from '../../interfaces';
 
 export class LcovReporter implements Reporter {
-	private _collector: Collector;
-	private _reporter: LcovOnlyReport;
+	/* private */ _collector: Collector;
+	/* private */ _reporter: LcovOnlyReport;
 
 	constructor(config: ReporterConfig = {}) {
 		this._collector = new Collector();

@@ -1,6 +1,6 @@
-import { EnvironmentType } from './EnvironmentType';
 import * as intern from '../main';
 import * as diffUtil from 'diff';
+import { Deferred, InternError } from '../interfaces';
 
 // AMD imports
 import * as has from 'dojo/has';
@@ -78,7 +78,7 @@ export function isAbsoluteUrl(url: string) {
 /**
  * Create a Deferred with some additional utility methods.
  */
-export function createDeferred() {
+export function createDeferred(): Deferred<any> {
 	let dfd = new Promise.Deferred(function (reason) {
 		throw reason;
 	});
@@ -87,11 +87,10 @@ export function createDeferred() {
 	 * Wraps any callback to resolve the deferred so long as the callback executes without throwing any Errors.
 	 */
 	let dfdAny: any = dfd;
-	dfdAny.callback = function (this: any, callback: Function) {
-		const self = this;
-		return self.rejectOnError(function (this: any) {
-			var returnValue = callback.apply(this, arguments);
-			self.resolve();
+	dfdAny.callback = function (this: Deferred<any>, callback: Function): any {
+		return this.rejectOnError((...args: any[]) => {
+			const returnValue = callback.apply(this, args);
+			this.resolve();
 			return returnValue;
 		});
 	};
@@ -99,19 +98,18 @@ export function createDeferred() {
 	/**
 	 * Wraps a callback to reject the deferred if the callback throws an Error.
 	 */
-	dfdAny.rejectOnError = function (this: any, callback: Function) {
-		const self = this;
-		return function (this: any) {
+	dfdAny.rejectOnError = function (this: Deferred<any>, callback: Function): any {
+		return (...args: any[]) => {
 			try {
-				return callback.apply(this, arguments);
+				return callback.apply(this, args);
 			}
 			catch (error) {
-				self.reject(error);
+				this.reject(error);
 			}
 		};
 	};
 
-	return dfd;
+	return <Deferred<any>> dfd;
 }
 
 export interface Queuer {
@@ -131,7 +129,7 @@ export function createQueue(maxConcurrency: number) {
 
 	function shiftQueue() {
 		if (queue.length) {
-			var callee = queue.shift();
+			const callee = queue.shift();
 			Promise.resolve(callee[0].apply(callee[1], callee[2])).finally(shiftQueue);
 		}
 		else {
@@ -176,11 +174,11 @@ export function escapeRegExp(str: any) {
  * @param error An object describing the error.
  * @returns A string message describing the error.
  */
-export function getErrorMessage(error: Error): string {
+export function getErrorMessage(error: string|Error|InternError): string {
 	/* jshint maxcomplexity:14 */
-	if (error.message || error.stack) {
-		var message = (error.name || 'Error') + ': ' + (error.message || 'Unknown error');
-		var stack = error.stack;
+	if (typeof error !== 'string' && (error.message || error.stack)) {
+		let message = (error.name || 'Error') + ': ' + (error.message || 'Unknown error');
+		let stack = error.stack;
 
 		if (stack) {
 			// V8 puts the original error at the top of the stack too; avoid redundant output that may
@@ -192,14 +190,14 @@ export function getErrorMessage(error: Error): string {
 				stack = stack.slice(String(error.message).length);
 			}
 
-			var filterStack = intern && intern.config && intern.config.filterErrorStack;
+			const filterStack = intern && intern.config && intern.config.filterErrorStack;
 			stack = normalizeStackTrace(stack, filterStack);
 		}
 
 		const anyError: any = error;
 
 		if (anyError.showDiff && typeof anyError.actual === 'object' && typeof anyError.expected === 'object') {
-			var diff = createDiff(anyError.actual, anyError.expected);
+			const diff = createDiff(anyError.actual, anyError.expected);
 			if (diff) {
 				message += '\n\n' + diff + '\n';
 			}
@@ -272,7 +270,7 @@ export function getShouldWait(waitMode: (string|boolean), message: string|any[])
  *
  * @returns {string} A string of instrumented code
  */
-export function instrument(filedata: string, filepath: string, instrumenterOptions: any) {
+export function instrument(filedata: string, filepath: string, instrumenterOptions?: any) {
 	const instrumenter = getInstrumenter(instrumenterOptions);
 	let options = (<any> instrumenter).opts;
 
@@ -323,8 +321,8 @@ export function normalizePath(path: string) {
 
 	const parts = path.replace(/\\/g, '/').split('/');
 	let result: string[] = [];
-	for (var i = 0; i < parts.length; ++i) {
-		var part = parts[i];
+	for (let i = 0; i < parts.length; ++i) {
+		let part = parts[i];
 
 		if (!part || part === '.') {
 			if (i === 0 || i === parts.length - 1) {
@@ -395,7 +393,7 @@ export function resolveModuleIds(moduleIds: string[]): string[] {
  * Run an async callback until it resolves, up to numRetries times
  */
 export function retry(callback: Function, numRetries: number) {
-	var numAttempts = 0;
+	let numAttempts = 0;
 	return callback().catch(function retry(error: Error) {
 		if (error.name !== 'CancelError' && ++numAttempts <= numRetries) {
 			return callback().catch(retry);
@@ -413,9 +411,9 @@ export function retry(callback: Function, numRetries: number) {
  * @returns A canonical, serialised representation of the object.
  */
 export function serialize(object: Object): string {
-	var indent = '';
-	var output = '';
-	var stack: any[] = [];
+	let indent = '';
+	let output = '';
+	let stack: any[] = [];
 
 	function writeDate(value: Date) {
 		output += value.toISOString();
@@ -429,8 +427,8 @@ export function serialize(object: Object): string {
 			return;
 		}
 
-		var isArray = Array.isArray(object);
-		var isFunction = typeof object === 'function';
+		const isArray = Array.isArray(object);
+		const isFunction = typeof object === 'function';
 
 		if (isArray) {
 			output += '[';
@@ -442,7 +440,7 @@ export function serialize(object: Object): string {
 			output += '{';
 		}
 
-		var keys = Object.keys(object);
+		const keys = Object.keys(object);
 
 		if (keys.length || isArray) {
 			stack.push(object);
@@ -602,7 +600,7 @@ function getInstrumenter(instrumenterOptions: any) {
 	const coverageVariable = instrumenterOptions.coverageVariable;
 
 	if (!instrumenters[coverageVariable]) {
-		var options = lang.mixin({
+		const options = lang.mixin({
 			// coverage variable is changed primarily to avoid any jshint complaints, but also to make
 			// it clearer where the global is coming from
 			coverageVariable: coverageVariable,
@@ -641,14 +639,14 @@ function getModules(moduleIds: string[], loader: IRequire) {
  * SourceMapConsumer.eachMapping should be in this order by default.
  */
 function getOriginalPosition(map: any, line: number, column: number): { line: number, column: number, source?: string } {
-	var originalPosition = map.originalPositionFor({ line: line, column: column});
+	let originalPosition = map.originalPositionFor({ line: line, column: column});
 
 	// if the SourceMapConsumer was able to find a location, return it
 	if (originalPosition.line !== null) {
 		return originalPosition;
 	}
 
-	var entries: MappingItem[] = [];
+	const entries: MappingItem[] = [];
 
 	// find all map entries that apply to the given line in the generated output
 	map.eachMapping(function (entry: MappingItem) {
@@ -790,7 +788,7 @@ function getSourceMap(filepath: string) {
 			}
 			else {
 				// treat map file path as relative to the source file
-				var mapFile = pathUtil.join(pathUtil.dirname(filepath), match[2]);
+				const mapFile = pathUtil.join(pathUtil.dirname(filepath), match[2]);
 				data = fs.readFileSync(mapFile, { encoding: 'utf8' });
 				fileSourceMaps[filepath] = loadSourceMap(data);
 			}

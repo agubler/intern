@@ -35,13 +35,13 @@ export class Proxy {
 
 	private _sessions: { [id: string]: { lastSequence: number, queue: any, listeners: any[] } };
 
-	constructor(config: ProxyConfig) {
+	constructor(config: ProxyConfig = {}) {
 		this.config = config;
 	}
 
 	start() {
 		return new Promise((resolve) => {
-			const server = this.server = http.createServer((request: http.IncomingMessage, response:http.ServerResponse) => {
+			const server = this.server = http.createServer((request: http.IncomingMessage, response: http.ServerResponse) => {
 				return this._handler(request, response);
 			});
 			this._sessions = {};
@@ -65,7 +65,7 @@ export class Proxy {
 				socket.setNoDelay(true);
 
 				socket.on('close', function () {
-					var index = sockets.indexOf(socket);
+					let index = sockets.indexOf(socket);
 					index !== -1 && sockets.splice(index, 1);
 				});
 			});
@@ -106,7 +106,7 @@ export class Proxy {
 		return session;
 	}
 
-	private _handler(request: http.IncomingMessage, response: http.ServerResponse) {
+	/* private */ _handler(request: http.IncomingMessage, response: http.ServerResponse) {
 		if (request.method === 'GET') {
 			if (/\/__resolveSuites__\?/.test(request.url)) {
 				this._resolveSuites(request, response);
@@ -124,7 +124,7 @@ export class Proxy {
 		else if (request.method === 'POST') {
 			request.setEncoding('utf8');
 
-			var data = '';
+			let data = '';
 			request.on('data', function (chunk) {
 				data += chunk;
 			});
@@ -139,7 +139,7 @@ export class Proxy {
 						return this._publishInSequence(message);
 					}));
 
-					var shouldWait = messages.some((message) => {
+					let shouldWait = messages.some((message) => {
 						return util.getShouldWait(this.config.waitForRunner, message.payload);
 					});
 
@@ -172,7 +172,7 @@ export class Proxy {
 		}
 	}
 
-	private _handleFile(request: http.IncomingMessage, response: http.ServerResponse, instrument?: boolean, omitContent?: boolean) {
+	/* private */ _handleFile(request: http.IncomingMessage, response: http.ServerResponse, instrument?: boolean, omitContent?: boolean) {
 		function send(contentType: string, data: string) {
 			response.writeHead(200, {
 				'Content-Type': contentType,
@@ -222,7 +222,7 @@ export class Proxy {
 			}
 
 			if (instrument) {
-				var mtime = stats.mtime.getTime();
+				const mtime = stats.mtime.getTime();
 				if (this._codeCache[wholePath] && this._codeCache[wholePath].mtime === mtime) {
 					send(contentType, this._codeCache[wholePath].data);
 				}
@@ -288,7 +288,7 @@ export class Proxy {
 			return message.resolver.promise;
 		}
 
-		var triggerMessage = message;
+		let triggerMessage = message;
 
 		do {
 			session.lastSequence = message.sequence;
@@ -305,7 +305,7 @@ export class Proxy {
 		return triggerMessage.resolver.promise;
 	}
 
-	private _resolveSuites(request: http.IncomingMessage, response: http.ServerResponse) {
+	/* private*/ _resolveSuites(request: http.IncomingMessage, response: http.ServerResponse) {
 		const query = url.parse(request.url, true).query;
 		const suites = JSON.parse(query.suites);
 		const resolvedSuites = JSON.stringify(util.resolveModuleIds(suites));

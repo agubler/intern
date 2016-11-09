@@ -5,7 +5,7 @@ import { Suite } from '../Suite';
 import * as util from '../util';
 
 // Legacy imports
-import intern = require('../../main');
+import * as intern from '../../main';
 
 // AMD modules
 import * as has from 'dojo/has';
@@ -141,7 +141,8 @@ export class Executor {
 	 * Code to execute before the main test run has started to set up the test system.
 	 */
 	protected _beforeRun() {
-		const self = intern.executor = this;
+		const self = this;
+		intern.setExecutor(this);
 		const config = this.config;
 
 		function enableInstrumentation() {

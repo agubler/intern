@@ -17,9 +17,11 @@
     "./types/leadfoot/leadfoot.d.ts",
     "./types/digdug/digdug.d.ts",
     "./types/istanbul/istanbul.d.ts",
-	"./types/charm/charm.d.ts"
+    "./types/charm/charm.d.ts",
+    "./tests/types/intern/intern.d.ts"
   ],
   "include": [
-    "./src/**/*.ts"
+    "./src/**/*.ts",
+    "./tests/**/*.ts"
   ]
 }

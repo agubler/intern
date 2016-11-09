@@ -2,12 +2,16 @@ import { after } from 'dojo/aspect';
 import { delegate } from 'dojo/lang';
 import * as Promise from 'dojo/Promise';
 import { Suite } from '../Suite';
-import { Test, TestFunction } from '../Test';
+import { Test } from '../Test';
 import { escapeRegExp } from '../util';
 import { assert, AssertionError } from 'chai';
 import { Removable } from '../../interfaces';
 import * as main from '../../main';
 import { Executor } from '../../lib/executors/Executor';
+
+export interface QUnitTestFunction {
+	(assert: QUnitBaseAssert): void;
+}
 
 export interface QUnitAssertions {
 	deepEqual(actual: any, expected: any, message?: string): void;
@@ -54,12 +58,12 @@ export interface QUnitHooks {
 
 let currentSuites: Suite[];
 
-function registerTest(name: string, test: TestFunction): void {
+function registerTest(name: string, test: QUnitTestFunction): void {
 	currentSuites.forEach(function (suite) {
 		suite.tests.push(new Test({
 			name: name,
 			parent: suite,
-			test: test
+			test: <any> test
 		}));
 	});
 }
@@ -211,7 +215,7 @@ export const QUnit = {
 	stop: function () {},
 
 	// test registration
-	asyncTest: function (name: string, test: TestFunction): void {
+	asyncTest: function (name: string, test: QUnitTestFunction): void {
 		registerTest(name, function (this: any) {
 			this.timeout = QUnit.config.testTimeout;
 
@@ -242,7 +246,7 @@ export const QUnit = {
 			}
 		});
 	},
-	module: function (name: string, lifecycle: QUnitHooks) {
+	module: function (name: string, lifecycle?: QUnitHooks) {
 		currentSuites = [];
 		main.executor.register(function (parentSuite: Suite) {
 			const suite = new Suite({ name: name, parent: parentSuite, _qunitContext: {} });
@@ -264,7 +268,7 @@ export const QUnit = {
 			}
 		});
 	},
-	test: function (name: string, test: TestFunction) {
+	test: function (name: string, test?: QUnitTestFunction) {
 		registerTest(name, function (this: any) {
 			const testAssert = delegate(baseAssert, { _expectedAssertions: NaN, _numAssertions: 0 });
 			test.call(this.parent._qunitContext, testAssert);

@@ -226,3 +226,13 @@ declare module 'istanbul/lib/report/lcovonly' {
 
 	export = LcovOnlyReport;
 }
+
+declare module 'istanbul/lib/hook' {
+	export function hookRequire(matcher: Function, transformer: Function, options?: any): void;
+	export function unhookRequire(): void;
+	export function hookCreateScript(matcher: Function, transformer: Function, options?: any): void;
+	export function unhookCreateScript(): void;
+	export function hookRunInThisContext(matcher: Function, transformer: Function, options?: any): void;
+	export function unhookRunInThisContext(): void;
+	export function unloadRequireCache(matcher: Function): void;
+}

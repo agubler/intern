@@ -1,12 +1,12 @@
 import { CommandLineArguments } from '../interfaces';
 
-export function fromCommandLine(rawArgs: string[]) {
+export let fromCommandLine = function(rawArgs: string[]) {
 	return parseArguments(rawArgs || process.argv.slice(2), function (str: string) {
 		return str;
 	});
-}
+};
 
-export function fromQueryString(query: string) {
+export let fromQueryString = function(query: string) {
 	return parseArguments(query.replace(/^\?/, '').split('&'), function (str) {
 		// Boolean properties should not be coerced into strings, but will be if they are passed to
 		// decodeURIComponent
@@ -16,7 +16,17 @@ export function fromQueryString(query: string) {
 
 		return decodeURIComponent(str);
 	});
-}
+};
+
+// exported for testing purposes
+export function _setFromQueryString(fn: Function) {
+	fromQueryString = <any> fn;
+};
+
+// exported for testing purposes
+export function _setFromCommandLine(fn: Function) {
+	fromCommandLine = <any> fn;
+};
 
 function parseArguments(rawArgs: string[], decode: (str: string) => any) {
 	let args: CommandLineArguments = {};

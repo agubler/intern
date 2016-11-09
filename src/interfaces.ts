@@ -5,8 +5,9 @@ import { ReporterDescriptor } from './lib/ReporterManager';
 import { EnvironmentType } from './lib/EnvironmentType';
 import { IConfig } from 'dojo/loader';
 import { Test } from './lib/Test';
-import { Suite } from './lib/Suite';
+import { Suite, SuiteConfig, SuiteLifecycleFunction } from './lib/Suite';
 import Command = require('leadfoot/Command');
+import Promise = require('dojo/Promise');
 
 export interface Config {
 	bail?: boolean;
@@ -55,6 +56,16 @@ export interface Config {
 		'host-browser'?: string;
 		'host-node'?: string;
 	};
+}
+
+export interface Deferred<T> extends Promise.Deferred<T> {
+	callback(callback: (...args: any[]) => any): any;
+	rejectOnError(callback: (...args: any[]) => any): any;
+}
+
+export interface ObjectSuiteConfig extends SuiteConfig {
+	after?: SuiteLifecycleFunction;
+	before?: SuiteLifecycleFunction;
 }
 
 export interface CommandLineArguments {

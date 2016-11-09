@@ -24,6 +24,18 @@ declare module 'dojo/node!fs' {
 	export * from 'fs';
 }
 
+declare module 'dojo/has!host-node?dojo/node!fs' {
+	export * from 'fs';
+}
+
+declare module 'dojo/has!host-node?dojo/node!istanbul/lib/hook' {
+	export * from 'istanbul/lib/hook';
+}
+
+declare module 'dojo/node!querystring' {
+	export * from 'querystring';
+}
+
 declare module 'dojo/node!leadfoot/Session' {
 	import Session = require('leadfoot/Session');
 	export = Session;
@@ -126,4 +138,8 @@ declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/text' {
 declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/text-summary' {
 	import TextSummaryReport = require('istanbul/lib/report/text-summary');
 	export = TextSummaryReport;
+}
+
+declare module 'dojo/text!*' {
+	export const text: string;
 }

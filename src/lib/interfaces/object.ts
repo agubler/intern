@@ -1,12 +1,8 @@
 import * as aspect from 'dojo/aspect';
 import * as main from '../../main';
-import { Suite, SuiteConfig, SuiteLifecycleFunction } from '../Suite';
+import { Suite } from '../Suite';
 import { Test } from '../Test';
-
-export interface ObjectSuiteConfig extends SuiteConfig {
-	after?: SuiteLifecycleFunction;
-	before?: SuiteLifecycleFunction;
-}
+import { ObjectSuiteConfig } from '../../interfaces';
 
 function _registerSuite(descriptor: ObjectSuiteConfig, parentSuite: Suite): void {
 	/* jshint maxcomplexity: 13 */
@@ -49,7 +45,7 @@ function _registerSuite(descriptor: ObjectSuiteConfig, parentSuite: Suite): void
 	}
 }
 
-export function registerSuite(mainDescriptor: ObjectSuiteConfig): void {
+function registerSuite(mainDescriptor: ObjectSuiteConfig): void {
 	main.executor.register(function (suite: Suite) {
 		let descriptor = mainDescriptor;
 
@@ -63,3 +59,5 @@ export function registerSuite(mainDescriptor: ObjectSuiteConfig): void {
 		_registerSuite(descriptor, suite);
 	});
 }
+
+export = registerSuite;

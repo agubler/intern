@@ -128,8 +128,8 @@ export class PrettyReporter implements Reporter {
 	watermarks: any;
 	tunnelState: string;
 	charm: Charm;
-	private _renderTimeout: NodeJS.Timer;
-	private _Report = Report;
+	/* private */ _renderTimeout: NodeJS.Timer;
+	/* private */ _Report = Report;
 
 	constructor(config: PrettyReporterConfig = {}) {
 		this.internConfig = config.internConfig;
@@ -270,7 +270,7 @@ export class PrettyReporter implements Reporter {
 		clearTimeout(this._renderTimeout);
 	}
 
-	deprecated(name: string, replacement: string, extra: string): void {
+	deprecated(name: string, replacement: string, extra?: string): void {
 		let message = '⚠ ' + name + ' is deprecated.';
 
 		if (replacement) {
@@ -378,7 +378,7 @@ export class PrettyReporter implements Reporter {
 		return result.join(' ');
 	}
 
-	private _render(omitLogs: boolean = false) {
+	/* private */ _render(omitLogs: boolean = false) {
 		const charm = this.charm;
 		const numReporters = Object.keys(this.reporters).length;
 		const logLength = this.dimensions.height - numReporters - 4 /* last line & total */ -

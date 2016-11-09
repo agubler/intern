@@ -244,7 +244,7 @@ export class Suite {
 	 *
 	 * @returns {module:dojo/Promise}
 	 */
-	run() {
+	run(): Promise<any> {
 		const reporterManager = this.reporterManager;
 		const self = this;
 		let startTime: number;
@@ -540,8 +540,8 @@ export class Suite {
 	 * @param {String} message
 	 * If provided, will be stored in this suite's `skipped` property.
 	 */
-	skip(message: string) {
-		this.skipped = message || 'suite skipped';
+	skip(message: string = 'suite skipped') {
+		this.skipped = message;
 		// Use the SKIP constant from Test so that calling Suite#skip from a test won't fail the test.
 		throw Test.SKIP;
 	}
