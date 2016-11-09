@@ -3,17 +3,17 @@ import * as diffUtil from 'diff';
 import { Deferred, InternError } from '../interfaces';
 
 // AMD imports
-import * as has from 'dojo/has';
+import has = require('dojo/has');
 import * as lang from 'dojo/lang';
-import * as Promise from 'dojo/Promise';
+import Promise = require('dojo/Promise');
 import { IRequire, IRequireCallback } from 'dojo/loader';
 
 // Node imports
-import fs = require('dojo/node!fs');
-import glob = require('dojo/node!glob');
-import pathUtil = require('dojo/node!path');
-import { hook, Instrumenter } from 'dojo/node!istanbul';
-import { SourceMapConsumer, MappingItem } from 'dojo/node!source-map';
+import fs = require('dojo/has!host-node?dojo/node!fs');
+import glob = require('dojo/has!host-node?dojo/node!glob');
+import pathUtil = require('dojo/has!host-node?dojo/node!path');
+import { hook, Instrumenter } from 'dojo/has!host-node?dojo/node!istanbul';
+import { SourceMapConsumer, MappingItem } from 'dojo/has!host-node?dojo/node!source-map';
 
 declare const require: IRequire;
 

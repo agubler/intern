@@ -1,6 +1,6 @@
 import * as Promise from 'dojo/Promise';
 
-import Session = require('dojo/node!leadfoot/Session');
+import Session = require('dojo/has!host-node?dojo/node!leadfoot/Session');
 
 /* istanbul ignore next: client-side code */
 function getCoverageData(coverageVariable: string) {

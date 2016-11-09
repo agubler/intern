@@ -5,6 +5,7 @@ import { Suite } from '../../../../src/lib/Suite';
 import { Test } from '../../../../src/lib/Test';
 import { Console } from '../../../../src/lib/reporters/Console';
 import * as pathUtil from 'dojo/has!host-node?dojo/node!path';
+import has = require('dojo/has');
 
 registerSuite({
 	name: 'intern/lib/reporters/Console',
@@ -76,13 +77,13 @@ registerSuite({
 		assert.lengthOf(mockConsole.messages['error'], 1,
 			'console.error should be called once for a fatal error');
 
-		const result = `${mockConsole.messages['warn'][0]}\n${mockConsole.messages['error'][0]}`;
+		const result = mockConsole.messages['warn'][0] + '\n' + mockConsole.messages['error'][0];
 		assert.match(result, /\bFATAL ERROR\b/, 'Reporter should indicate that a fatal error occurred');
 		assert.include(result, 'Oops', 'Reporter should include the message from the error');
 		if (result.indexOf('No stack or location') === -1) {
 			// the line number in the message should be the same as the line where the new Error
 			// was created above
-			let expected = 'tests/unit/lib/reporters/Console.ts:70';
+			let expected = has('host-node') ? 'tests/unit/lib/reporters/Console.ts:71' : 'tests/unit/lib/reporters/Console.js';
 			if (pathUtil && pathUtil.sep !== '/') {
 				expected = expected.replace(/\//g, pathUtil.sep);
 			}

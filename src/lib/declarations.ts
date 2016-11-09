@@ -6,12 +6,12 @@ declare module 'dojo/node!path' {
 	export * from 'path';
 }
 
-declare module 'dojo/node!glob' {
+declare module 'dojo/has!host-node?dojo/node!glob' {
 	import glob = require('glob');
 	export = glob;
 }
 
-declare module 'dojo/node!source-map' {
+declare module 'dojo/has!host-node?dojo/node!source-map' {
 	import sourceMap = require('source-map');
 	export = sourceMap;
 }
@@ -36,7 +36,7 @@ declare module 'dojo/node!querystring' {
 	export * from 'querystring';
 }
 
-declare module 'dojo/node!leadfoot/Session' {
+declare module 'dojo/has!host-node?dojo/node!leadfoot/Session' {
 	import Session = require('leadfoot/Session');
 	export = Session;
 }
@@ -82,7 +82,7 @@ declare module 'dojo/node!charm/lib/encode' {
 	export = encode;
 }
 
-declare module 'dojo/node!istanbul' {
+declare module 'dojo/has!host-node?dojo/node!istanbul' {
 	export * from 'istanbul';
 }
 
@@ -126,7 +126,7 @@ declare module 'dojo/node!istanbul/lib/report/lcovonly' {
 	export = LcovOnlyReport;
 }
 
-declare module 'dojo/node!istanbul/lib/report/common/defaults' {
+declare module 'dojo/has!host-node?dojo/node!istanbul/lib/report/common/defaults' {
 	export * from 'istanbul/lib/report/common/defaults';
 }
 
