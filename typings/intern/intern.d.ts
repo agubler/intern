@@ -1,4 +1,4 @@
-/// <reference path="../chai/chai.d.ts" />
+/// <reference types="chai" />
 /// <reference path="../digdug/digdug.d.ts" />
 /// <reference path="../leadfoot/leadfoot.d.ts" />
 /// <reference path="../dojo2/dojo.d.ts" />
